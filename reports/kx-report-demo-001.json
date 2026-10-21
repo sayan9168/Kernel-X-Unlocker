@@ -1,0 +1,1624 @@
+{
+  "disclaimer": "## Ethical & Scope Disclaimer\n\nThis document was produced by **Kernel-X Research Toolkit**, an *observational*\nsecurity-analysis instrument intended for academic study, defensive hardening\nand audit documentation. Its outputs are derived exclusively from static\ntelemetry, publicly published advisories and in-process simulations.\n\nThe toolkit is **not** an exploitation framework. It contains no exploit code,\nperforms no memory access (`/dev/mem`, `/dev/kmem`, ptrace) and issues no\ncommands against hardware-backed security services (KeyMint/keystore2,\nGatekeeper, Weaver). All \"simulation\" results describe *modelled* behaviour of\ndocumented Android/Linux security boundaries; they do not constitute,\nendorse, or assist unauthorised access to any device or account.\n\nResearch described here must comply with applicable law and institutional\npolicy (e.g., ACM/IEEE code of ethics, CFAA/EU Directive 2013/40/EU, and your\nIRB/ethics-board approval). Only assess systems you own or have explicit,\nwritten authorisation to test, and follow coordinated-disclosure timelines when\nreporting real vulnerabilities. Findings herein are *correlation-based\ncandidates*; verify against vendor changelogs before disclosure or publication.\n",
+  "environment": {
+    "environment_sha256": "10d2e25796dab26a28d994fcb41ec4ef38af4cd59e83b4bcdc1e69a954312c08",
+    "machine": "x86_64",
+    "os": "Linux",
+    "python": "3.12.10",
+    "release": "5.10.134-013.15.kangaroo.al8.x86_64",
+    "toolkit_git": "28847c1"
+  },
+  "fingerprint": {
+    "android_version": "11",
+    "architecture": "x86_64",
+    "avb_version": "AVB 2.0",
+    "bootloader_state": "unlocked",
+    "build_fingerprint": "",
+    "config_options": {
+      "ANDROID_BINDERFS": "unset",
+      "ANDROID_BINDER_IPC": "unset",
+      "ASHMEM": "unset",
+      "BPF_JIT": "unset",
+      "BPF_SYSCALL": "unset",
+      "CGROUPS": "unset",
+      "DEVMEM": "unset",
+      "DMABUF_HEAPS": "unset",
+      "ION": "unset",
+      "KALLSYMS": "unset",
+      "LKDTM": "unset",
+      "NETFILTER": "unset",
+      "NFC": "unset",
+      "SECURITY_APPARMOR": "unset",
+      "SECURITY_SELINUX": "unset",
+      "STAGING": "unset",
+      "TUN": "unset",
+      "USB_GADGET": "unset",
+      "XFRM": "unset"
+    },
+    "developer_options_enabled": false,
+    "device_name": "SM-G986B",
+    "extra": {
+      "adb_secure": "",
+      "build_type": "",
+      "cpu_implementer": "unknown",
+      "cpu_model": "Intel(R) Xeon(R) Processor",
+      "cpu_part": "unknown",
+      "debuggable": "",
+      "emulator_hint": "",
+      "hostname": "c-6ad861fa-015982b3-f5a0387f6f5e",
+      "kconfig_available": "no"
+    },
+    "fbe_content_mode": "aes-256-xts:integrity:aes-256-cts",
+    "fbe_encryption_type": "file",
+    "fbe_metadata_mode": "aes-256-xts",
+    "fileencryption_token": "none/unencrypted",
+    "gatekeeper_tee_timeout_ms": 0,
+    "gki_variant": "non-GKI / vendor kernel",
+    "hardening_flags": {},
+    "hardware": "exynos9825",
+    "kernel_build_host": "unknown",
+    "kernel_series": [
+      5,
+      10
+    ],
+    "kernel_version": "5.10.134-013.15.kangaroo.al8.x86_64",
+    "keystore2_backend": "keymaster 4.x HAL",
+    "manufacturer": "Samsung",
+    "model": "SM-G986B",
+    "product": "unknown-product",
+    "sdk_level": 30,
+    "security_patch_level": "2021-05-01",
+    "sepolicy_debug": false,
+    "soc_codename": "Exynos",
+    "soc_id": "unknown",
+    "soc_vendor": "Samsung",
+    "vendor": "",
+    "verified_boot_state": "orange",
+    "verity_mode": "unknown",
+    "weaver_backend": "unspecified"
+  },
+  "generated_at": "2026-10-21T07:13:19+00:00",
+  "integrity": {
+    "canonical_body_sha256": "b8271417e7522d5cc5eb51c38193e099f0149013c3edfbc54bd706dd912c1398"
+  },
+  "metadata": {
+    "author": "Security Architecture Research Group",
+    "institution": "Autonomous Systems Security Lab",
+    "mode": "static-analysis + dry-run-simulation",
+    "title": "Android Kernel Security Posture Assessment",
+    "toolkit": "Kernel-X Research Toolkit"
+  },
+  "notes": [],
+  "plugin_observations": {
+    "_knowledge_base_digest": "32264ae664c0af29"
+  },
+  "risk_assessment": {
+    "findings": [
+      {
+        "affected_range": "4.9 .. 5.115",
+        "confidence": 1.0,
+        "contribution": 3.267,
+        "cve_id": "CVE-2022-20172",
+        "cvss_base": 5.87,
+        "cvss_vector": "CVSS:3.1/AV:N/AC:L/UI:N/S:U/C:H/I:H/A:H",
+        "exploit_maturity": "poc",
+        "rationale": "kernel series within documented range 4.9 .. 5.115; declared patch level 2021-05-01 predates the 2022-09-05 fix bulletin; patch level 1999d old - stale",
+        "reference": "https://security.samsungmobile.com/workSMSrv.do",
+        "remediation": "Apply Samsung maintenance release >= 2022-09; disable dormant modem proxy services.",
+        "status": "EXPOSED-CANDIDATE",
+        "subsystem": "exynos-lpa",
+        "title": "Samsung Exynos baseband/proxy ABI weakness class affecting AP-side IPC endpoints"
+      },
+      {
+        "affected_range": "5.8 .. 5.29",
+        "confidence": 1.0,
+        "contribution": 2.363,
+        "cve_id": "CVE-2022-0847",
+        "cvss_base": 5.87,
+        "cvss_vector": "CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H",
+        "exploit_maturity": "weaponized-in-wild",
+        "rationale": "kernel series within documented range 5.8 .. 5.29; declared patch level 2021-05-01 predates the 2022-03-05 fix bulletin; patch level 1999d old - stale",
+        "reference": "https://nvd.nist.gov/vuln/detail/CVE-2022-0847",
+        "remediation": "Update the kernel to >= 5.10.102 / 5.15.25 / 5.16.11 and apply the 2022-03 Android Security Bulletin; deploy GKI 5.10 LTS builds.",
+        "status": "EXPOSED-CANDIDATE",
+        "subsystem": "core-mm-pipe",
+        "title": "Dirty Pipe - pipe buffer flag corruption enables overwrite of cached files"
+      },
+      {
+        "affected_range": "4.14 .. 5.52",
+        "confidence": 1.0,
+        "contribution": 2.114,
+        "cve_id": "CVE-2021-3489",
+        "cvss_base": 5.87,
+        "cvss_vector": "CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H",
+        "exploit_maturity": "poc",
+        "rationale": "kernel series within documented range 4.14 .. 5.52; eBPF syscall surface present; declared patch level 2021-05-01 predates the 2021-09-05 fix bulletin; patch level 1999d old - stale",
+        "reference": "https://nvd.nist.gov/vuln/detail/CVE-2021-3489",
+        "remediation": "Update to >= 5.12.4 / apply 2021-09 bulletin; disable unprivileged BPF where unused.",
+        "status": "EXPOSED-CANDIDATE",
+        "subsystem": "ebpf-verifier",
+        "title": "eBPF signed-divide register-bound miscomputation permits out-of-bounds map access"
+      },
+      {
+        "affected_range": "5.8 .. 6.21",
+        "confidence": 1.0,
+        "contribution": 2.114,
+        "cve_id": "CVE-2023-0384",
+        "cvss_base": 5.87,
+        "cvss_vector": "CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H",
+        "exploit_maturity": "poc",
+        "rationale": "kernel series within documented range 5.8 .. 6.21; declared patch level 2021-05-01 predates the 2023-03-05 fix bulletin; patch level 1999d old - stale",
+        "reference": "https://nvd.nist.gov/vuln/detail/CVE-2023-0384",
+        "remediation": "Update to >= 6.1.21 / apply the 2023-03 bulletin.",
+        "status": "EXPOSED-CANDIDATE",
+        "subsystem": "core-mm-numa",
+        "title": "MPOL_BIND NUMA policy integer underflow leading to out-of-bounds page-table write"
+      },
+      {
+        "affected_range": "5.9 .. 6.5",
+        "confidence": 0.7,
+        "contribution": 1.654,
+        "cve_id": "CVE-2023-32254",
+        "cvss_base": 5.87,
+        "cvss_vector": "CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H",
+        "exploit_maturity": "weaponized-in-wild",
+        "rationale": "kernel series within documented range 5.9 .. 6.5; CONFIG_NETFILTER unverifiable (kconfig unavailable); declared patch level 2021-05-01 predates the 2023-06-05 fix bulletin; patch level 1999d old - stale",
+        "reference": "https://nvd.nist.gov/vuln/detail/CVE-2023-32254",
+        "remediation": "Update to >= 6.3.2 / apply the 2023-06 bulletin; confine nftables to trusted uids.",
+        "status": "EXPOSED-CANDIDATE",
+        "subsystem": "core-netfilter",
+        "title": "nf_tables anonymous set tracking use-after-free during GC (net-admin reachable)"
+      },
+      {
+        "affected_range": "4.14 .. 5.115",
+        "confidence": 1.0,
+        "contribution": 1.617,
+        "cve_id": "CVE-2022-20445",
+        "cvss_base": 5.87,
+        "cvss_vector": "CVSS:3.1/AV:L/AC:L/UI:N/S:C/C:H/I:H/A:H",
+        "exploit_maturity": "unknown",
+        "rationale": "kernel series within documented range 4.14 .. 5.115; declared patch level 2021-05-01 predates the 2022-07-05 fix bulletin; patch level 1999d old - stale",
+        "reference": "https://source.android.com/docs/security/bulletin/2022-07-01",
+        "remediation": "Apply MediaTek OEM BSP update from the 2022-07 bulletin.",
+        "status": "EXPOSED-CANDIDATE",
+        "subsystem": "mediatek-hypervisor",
+        "title": "MediaTek hypervisor IPC input-validation weakness (vELM message boundary)"
+      },
+      {
+        "affected_range": "0.0 .. 99.0",
+        "confidence": 1.0,
+        "contribution": 1.529,
+        "cve_id": "CVE-2023-20947",
+        "cvss_base": 3.6,
+        "cvss_vector": "CVSS:3.1/AV:N/AC:L/UI:N/S:U/C:H/I:N/A:N",
+        "exploit_maturity": "unknown",
+        "rationale": "kernel series within documented range 0.0 .. 99.0; declared patch level 2021-05-01 predates the 2023-03-05 fix bulletin; patch level 1999d old - stale",
+        "reference": "https://source.android.com/docs/security/bulletin/2023-03-01",
+        "remediation": "Apply the 2023-03 bulletin; restrict ProfilerInfo to privileged callers.",
+        "status": "EXPOSED-CANDIDATE",
+        "subsystem": "framework-profiler",
+        "title": "System server information disclosure via profiler state leakage to untrusted apps"
+      },
+      {
+        "affected_range": "4.4 .. 5.38",
+        "confidence": 0.7,
+        "contribution": 1.48,
+        "cve_id": "CVE-2022-2588",
+        "cvss_base": 5.87,
+        "cvss_vector": "CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H",
+        "exploit_maturity": "poc",
+        "rationale": "kernel series within documented range 4.4 .. 5.38; CONFIG_XFRM unverifiable (kconfig unavailable); declared patch level 2021-05-01 predates the 2022-08-05 fix bulletin; patch level 1999d old - stale",
+        "reference": "https://nvd.nist.gov/vuln/detail/CVE-2022-2588",
+        "remediation": "Update to >= 5.18.19 / apply the 2022-08 bulletin; namespace xfrm exposure.",
+        "status": "EXPOSED-CANDIDATE",
+        "subsystem": "core-net-route",
+        "title": "Classic eBPF route-key use-after-free in xfrm garbage collection (netns-local)"
+      },
+      {
+        "affected_range": "4.0 .. 5.48",
+        "confidence": 0.7,
+        "contribution": 1.48,
+        "cve_id": "CVE-2022-2586",
+        "cvss_base": 5.87,
+        "cvss_vector": "CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H",
+        "exploit_maturity": "poc",
+        "rationale": "kernel series within documented range 4.0 .. 5.48; CONFIG_NETFILTER unverifiable (kconfig unavailable); declared patch level 2021-05-01 predates the 2022-08-05 fix bulletin; patch level 1999d old - stale",
+        "reference": "https://nvd.nist.gov/vuln/detail/CVE-2022-2586",
+        "remediation": "Update to >= 5.18.15; restrict CAP_NET_ADMIN to netd/privileged domains.",
+        "status": "EXPOSED-CANDIDATE",
+        "subsystem": "core-net-filter",
+        "title": "cls_route refcount leak in TC route classifier enabling use-after-free"
+      },
+      {
+        "affected_range": "0.0 .. 99.0",
+        "confidence": 1.0,
+        "contribution": 1.294,
+        "cve_id": "CVE-2021-39633",
+        "cvss_base": 3.6,
+        "cvss_vector": "CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:N/A:N",
+        "exploit_maturity": "poc",
+        "rationale": "kernel series within documented range 0.0 .. 99.0; declared patch level 2021-05-01 predates the 2021-11-05 fix bulletin; patch level 1999d old - stale",
+        "reference": "https://source.android.com/docs/security/bulletin/2021-11-01",
+        "remediation": "Apply the 2021-11 bulletin (framework/media codec hardening).",
+        "status": "EXPOSED-CANDIDATE",
+        "subsystem": "mediadrm",
+        "title": "MediaCodecs privileged information disclosure through uninitialized memory read"
+      },
+      {
+        "affected_range": "4.0 .. 5.204",
+        "confidence": 0.25,
+        "contribution": 0.591,
+        "cve_id": "CVE-2019-2025",
+        "cvss_base": 5.87,
+        "cvss_vector": "CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H",
+        "exploit_maturity": "weaponized-in-wild",
+        "rationale": "kernel series within documented range 4.0 .. 5.204; legacy ION allocator indicated; declared patch level 2021-05-01 postdates the 2020-09-05 fix bulletin - remediation expected present; patch level 1999d old - stale",
+        "reference": "https://nvd.nist.gov/vuln/detail/CVE-2019-2025",
+        "remediation": "Migrate from legacy ION to the dma-buf heaps framework (>= 5.4) and apply the 2020-09 bulletin.",
+        "status": "LIKELY-PATCHED",
+        "subsystem": "ion-dmabuf",
+        "title": "ION improper release of unmapped pages allows DMA-BUF reuse after free (UAF class)"
+      },
+      {
+        "affected_range": "4.4 .. 5.114",
+        "confidence": 0.7,
+        "contribution": 0.538,
+        "cve_id": "CVE-2021-0704",
+        "cvss_base": 5.87,
+        "cvss_vector": "CVSS:3.1/AV:P/AC:L/UI:N/S:U/C:H/I:H/A:H",
+        "exploit_maturity": "poc",
+        "rationale": "kernel series within documented range 4.4 .. 5.114; CONFIG_USB_GADGET unverifiable (kconfig unavailable); declared patch level 2021-05-01 predates the 2021-06-05 fix bulletin; patch level 1999d old - stale",
+        "reference": "https://source.android.com/docs/security/bulletin/2021-06-01",
+        "remediation": "Apply the 2021-06 bulletin; disable ADB-over-USB in production builds.",
+        "status": "EXPOSED-CANDIDATE",
+        "subsystem": "usb-gadget",
+        "title": "USB gadget functionfs improper input validation in vendor descriptor path"
+      }
+    ],
+    "fingerprint_hash": "3976ae75dac1ec08",
+    "metadata": {
+      "generated_at": "2026-10-21T07:13:19.069311+00:00",
+      "knowledge_base_size": 20,
+      "mitigation_net_credit": 0.05,
+      "patch_decay": 1.0,
+      "patch_decay_note": "patch level 1999d old - stale",
+      "posture": {
+        "bootloader_unlocked": true,
+        "fde_legacy": false,
+        "gki": false,
+        "kconfig_available": false,
+        "keystore_software": false,
+        "patch_age_days": 1999,
+        "patch_stale": true,
+        "sepolicy_debug": false,
+        "verified_boot_ok": false,
+        "weak_fbe_profile": false
+      },
+      "raw_aggregated_score": 8.934,
+      "scoring_model": "CVSS3.1-impact x reachability x exploit-maturity x applicability x patch-decay, complement-aggregated, mitigation-adjusted",
+      "surface_candidates": 12
+    },
+    "mitigations": {
+      "dmabuf_heaps": 0.0,
+      "gki_lts": 0.0,
+      "modern_fbe": 0.1,
+      "recent_patch": 0.0,
+      "risk_penalties": -0.1,
+      "selinux_enforcing": 0.05,
+      "verified_boot": 0.0
+    },
+    "raw_score": 8.934,
+    "recommendations": [
+      "Track the latest Android Security Bulletin and OTA baseline; patch age is the single strongest predictor of aggregate kernel exposure.",
+      "Prioritize monitoring/verification for the highest-contributing subsystems: core-mm-numa, core-mm-pipe, ebpf-verifier, exynos-lpa.",
+      "Verify the 2022-03 (Dirty Pipe) fix is present in the running kernel build via the vendor changelog rather than the version string alone.",
+      "Prefer builds that replace legacy ION with dma-buf heaps and constrain heap access with SELinux genfs contexts.",
+      "Set kernel.unprivileged_bpf_disabled=1 (or 2 on >= 5.8) and restrict BPF program loading to trusted domains.",
+      "Re-lock the bootloader for production evaluation units: an unlocked device invalidates AVB trust assumptions across the whole assessment.",
+      "Restore/verify the AVB chain-of-trust (vbmeta digest, rollback protection indexes) before drawing conclusions about boot-path integrity.",
+      "All findings are *candidates* derived from static version/config correlation; confirm each via vendor source changelogs before publication."
+    ],
+    "risk_score": 9.38,
+    "severity": "CRITICAL",
+    "subsystem_scores": {
+      "core-mm-numa": 2.114,
+      "core-mm-pipe": 2.363,
+      "core-net-filter": 1.48,
+      "core-net-route": 1.48,
+      "core-netfilter": 1.654,
+      "ebpf-verifier": 2.114,
+      "exynos-lpa": 3.267,
+      "framework-profiler": 1.529,
+      "ion-dmabuf": 0.591,
+      "mediadrm": 1.294,
+      "mediatek-hypervisor": 1.617,
+      "usb-gadget": 0.538
+    }
+  },
+  "schema": "kx-report/1.0",
+  "session": {
+    "findings": 12,
+    "risk_score": 9.38,
+    "scenarios_passed": 5,
+    "scenarios_run": 5,
+    "session_id": "demo-001",
+    "severity": "CRITICAL",
+    "started_at": "2026-10-21T07:13:19.070715+00:00",
+    "title": "Android Kernel Security Posture Assessment"
+  },
+  "simulation": [
+    {
+      "duration_s": 0.0004,
+      "events": [
+        {
+          "action": "generate:de_store",
+          "actor": "keystore2",
+          "note": "AES-256-GCM@TrustedEnvironment auth_bound=False",
+          "outcome": "OK",
+          "t_offset": 0.0
+        },
+        {
+          "action": "generate:ce_store",
+          "actor": "keystore2",
+          "note": "AES-256-GCM@TrustedEnvironment auth_bound=False",
+          "outcome": "OK",
+          "t_offset": 0.0
+        },
+        {
+          "action": "begin:de_store:ENCRYPT",
+          "actor": "keystore2",
+          "note": "handle=0xe25a252f level=TrustedEnvironment",
+          "outcome": "GRANTED",
+          "t_offset": 0.0
+        },
+        {
+          "action": "begin:ce_store:ENCRYPT",
+          "actor": "keystore2",
+          "note": "CE key unavailable while credential storage is locked",
+          "outcome": "DENIED_STORAGE_LOCKED",
+          "t_offset": 0.0
+        },
+        {
+          "action": "verify-credential",
+          "actor": "gatekeeper",
+          "note": "attempt 1",
+          "outcome": "FAILED",
+          "t_offset": 0.0
+        },
+        {
+          "action": "begin:ce_store:ENCRYPT",
+          "actor": "keystore2",
+          "note": "CE key unavailable while credential storage is locked",
+          "outcome": "DENIED_STORAGE_LOCKED",
+          "t_offset": 0.0
+        },
+        {
+          "action": "set-mock-credential",
+          "actor": "provisioner",
+          "note": "alias=owner",
+          "outcome": "OK",
+          "t_offset": 0.0
+        },
+        {
+          "action": "verify-credential",
+          "actor": "gatekeeper",
+          "note": "sid->1; CE storage unlocked",
+          "outcome": "VERIFIED",
+          "t_offset": 0.0
+        },
+        {
+          "action": "begin:ce_store:ENCRYPT",
+          "actor": "keystore2",
+          "note": "handle=0xe80f9fec level=TrustedEnvironment",
+          "outcome": "GRANTED",
+          "t_offset": 0.0
+        }
+      ],
+      "notes": [],
+      "passed": true,
+      "scenario": "fbe-direct-boot-vs-credential-storage",
+      "steps": [
+        {
+          "call": [
+            "snapshot"
+          ],
+          "checks": [
+            {
+              "actual": true,
+              "check": "success",
+              "expected": true,
+              "ok": true
+            }
+          ],
+          "note": "device starts locked: CE storage sealed",
+          "passed": true,
+          "result": {
+            "data": {
+              "boot_state": "verified",
+              "device_unlocked": false,
+              "elapsed_s": 0.0,
+              "failed_attempts": 0,
+              "keys": [],
+              "lockout_active": false,
+              "timeline": [],
+              "user_sid": 0
+            },
+            "detail": "snapshot returned dict",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.069+00:00"
+          },
+          "step": "cold-boot state"
+        },
+        {
+          "call": [
+            "generate_key",
+            "de_store",
+            "AES_GCM",
+            "TrustedEnvironment",
+            false,
+            0,
+            true,
+            "credential-encrypted-direct"
+          ],
+          "checks": [
+            {
+              "actual": true,
+              "check": "success",
+              "expected": true,
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "alias": "de_store",
+              "blob_length": 144,
+              "key_id_hash": "c7fd9f1528dfc7691d676e9e5408192e"
+            },
+            "detail": "simulated key generated",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.069+00:00"
+          },
+          "step": "gen DE key"
+        },
+        {
+          "call": [
+            "generate_key",
+            "ce_store",
+            "AES_GCM",
+            "TrustedEnvironment",
+            false,
+            0,
+            false,
+            "credential-encrypted"
+          ],
+          "checks": [
+            {
+              "actual": true,
+              "check": "success",
+              "expected": true,
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "alias": "ce_store",
+              "blob_length": 144,
+              "key_id_hash": "1378bf6c495af9de7bce053bc95111ab"
+            },
+            "detail": "simulated key generated",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.069+00:00"
+          },
+          "step": "gen CE key"
+        },
+        {
+          "call": [
+            "begin_operation",
+            "de_store"
+          ],
+          "checks": [
+            {
+              "actual": true,
+              "check": "success",
+              "expected": true,
+              "ok": true
+            },
+            {
+              "actual": "GRANTED",
+              "check": "status",
+              "expected": "GRANTED",
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "handle": 3797558575,
+              "handle_hex": "0xe25a252f",
+              "operation_token_sha256": "8ff79b2745977dd860ad47b35ba6dced4ee2d65bf4a80616c156c09294168a7a",
+              "requires_confirmation": false
+            },
+            "detail": "operation began (simulated handle)",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.069+00:00"
+          },
+          "step": "use DE while locked"
+        },
+        {
+          "call": [
+            "begin_operation",
+            "ce_store"
+          ],
+          "checks": [
+            {
+              "actual": false,
+              "check": "success",
+              "expected": false,
+              "ok": true
+            },
+            {
+              "actual": "DENIED_STORAGE_LOCKED",
+              "check": "status",
+              "expected": "DENIED_STORAGE_LOCKED",
+              "ok": true
+            }
+          ],
+          "note": "models FBE: CE keys unusable before user authentication",
+          "passed": true,
+          "result": {
+            "data": {
+              "domain": "credential-encrypted"
+            },
+            "detail": "CE key unavailable while credential storage is locked",
+            "status": "DENIED_STORAGE_LOCKED",
+            "success": false,
+            "timestamp": "2026-10-21T07:13:19.069+00:00"
+          },
+          "step": "use CE while locked"
+        },
+        {
+          "call": [
+            "verify_lockscreen_credential",
+            "correct-mock-pin"
+          ],
+          "checks": [
+            {
+              "actual": false,
+              "check": "success",
+              "expected": false,
+              "ok": true
+            },
+            {
+              "actual": "DENIED_POLICY",
+              "check": "status",
+              "expected": "DENIED_POLICY",
+              "ok": true
+            }
+          ],
+          "note": "no mock credential provisioned yet -> verification rejected",
+          "passed": true,
+          "result": {
+            "data": {
+              "failed_attempts": 1
+            },
+            "detail": "credential rejected (simulated)",
+            "status": "DENIED_POLICY",
+            "success": false,
+            "timestamp": "2026-10-21T07:13:19.069+00:00"
+          },
+          "step": "verify credential"
+        },
+        {
+          "call": [
+            "begin_operation",
+            "ce_store"
+          ],
+          "checks": [
+            {
+              "actual": false,
+              "check": "success",
+              "expected": false,
+              "ok": true
+            },
+            {
+              "actual": "DENIED_STORAGE_LOCKED",
+              "check": "status",
+              "expected": "DENIED_STORAGE_LOCKED",
+              "ok": true
+            }
+          ],
+          "note": "models FBE: CE keys unusable before user authentication",
+          "passed": true,
+          "result": {
+            "data": {
+              "domain": "credential-encrypted"
+            },
+            "detail": "CE key unavailable while credential storage is locked",
+            "status": "DENIED_STORAGE_LOCKED",
+            "success": false,
+            "timestamp": "2026-10-21T07:13:19.069+00:00"
+          },
+          "step": "CE still sealed after failed auth"
+        },
+        {
+          "call": [
+            "provision_mock_credential",
+            "owner",
+            "correct-mock-pin"
+          ],
+          "checks": [],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "return_type": "NoneType"
+            },
+            "detail": "provision_mock_credential returned NoneType",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.069+00:00"
+          },
+          "step": "provision owner credential"
+        },
+        {
+          "call": [
+            "verify_lockscreen_credential",
+            "correct-mock-pin"
+          ],
+          "checks": [
+            {
+              "actual": true,
+              "check": "success",
+              "expected": true,
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "ce_storage_unlocked": true,
+              "sid": 1
+            },
+            "detail": "credential verified (simulated)",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.069+00:00"
+          },
+          "step": "unlock with correct credential"
+        },
+        {
+          "call": [
+            "begin_operation",
+            "ce_store"
+          ],
+          "checks": [
+            {
+              "actual": true,
+              "check": "success",
+              "expected": true,
+              "ok": true
+            },
+            {
+              "actual": "GRANTED",
+              "check": "status",
+              "expected": "GRANTED",
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "handle": 3893338092,
+              "handle_hex": "0xe80f9fec",
+              "operation_token_sha256": "652da782555d5674e4868bbbcd74b9c770bd43501d7126e71c7bb5a5303b7ed9",
+              "requires_confirmation": false
+            },
+            "detail": "operation began (simulated handle)",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.069+00:00"
+          },
+          "step": "use CE after unlock"
+        }
+      ]
+    },
+    {
+      "duration_s": 0.0002,
+      "events": [
+        {
+          "action": "set-mock-credential",
+          "actor": "provisioner",
+          "note": "alias=owner",
+          "outcome": "OK",
+          "t_offset": 0.0
+        },
+        {
+          "action": "generate:pay_key",
+          "actor": "keystore2",
+          "note": "ECDSA-P256@StrongBox auth_bound=True",
+          "outcome": "OK",
+          "t_offset": 0.0
+        },
+        {
+          "action": "begin:pay_key:ENCRYPT",
+          "actor": "keystore2",
+          "note": "CE key unavailable while credential storage is locked",
+          "outcome": "DENIED_STORAGE_LOCKED",
+          "t_offset": 0.0
+        },
+        {
+          "action": "verify-credential",
+          "actor": "gatekeeper",
+          "note": "sid->1; CE storage unlocked",
+          "outcome": "VERIFIED",
+          "t_offset": 0.0
+        },
+        {
+          "action": "begin:pay_key:ENCRYPT",
+          "actor": "keystore2",
+          "note": "handle=0x6f48866d level=StrongBox",
+          "outcome": "GRANTED",
+          "t_offset": 0.0
+        },
+        {
+          "action": "begin:pay_key:ENCRYPT",
+          "actor": "keystore2",
+          "note": "auth validity window expired (20000ms > 10000ms)",
+          "outcome": "DENIED_AUTH_REQUIRED",
+          "t_offset": 20.0
+        },
+        {
+          "action": "verify-credential",
+          "actor": "gatekeeper",
+          "note": "sid->2; CE storage already unlocked",
+          "outcome": "VERIFIED",
+          "t_offset": 20.0
+        },
+        {
+          "action": "begin:pay_key:ENCRYPT",
+          "actor": "keystore2",
+          "note": "handle=0x8f37fb03 level=StrongBox",
+          "outcome": "GRANTED",
+          "t_offset": 20.0
+        }
+      ],
+      "notes": [],
+      "passed": true,
+      "scenario": "auth-bound-key-lifetime",
+      "steps": [
+        {
+          "call": [
+            "provision_mock_credential",
+            "owner",
+            "correct-mock-pin"
+          ],
+          "checks": [],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "return_type": "NoneType"
+            },
+            "detail": "provision_mock_credential returned NoneType",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.069+00:00"
+          },
+          "step": "provision credential"
+        },
+        {
+          "call": [
+            "generate_key",
+            "pay_key",
+            "ECDSA_P256",
+            "StrongBox",
+            true,
+            10000,
+            false,
+            "credential-encrypted"
+          ],
+          "checks": [
+            {
+              "actual": true,
+              "check": "success",
+              "expected": true,
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "alias": "pay_key",
+              "blob_length": 144,
+              "key_id_hash": "3672458ac0c716418d74d9ad3af32504"
+            },
+            "detail": "simulated key generated",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.069+00:00"
+          },
+          "step": "gen auth-bound key"
+        },
+        {
+          "call": [
+            "begin_operation",
+            "pay_key"
+          ],
+          "checks": [
+            {
+              "actual": false,
+              "check": "success",
+              "expected": false,
+              "ok": true
+            },
+            {
+              "actual": "DENIED_STORAGE_LOCKED",
+              "check": "status",
+              "expected": "DENIED_STORAGE_LOCKED",
+              "ok": true
+            }
+          ],
+          "note": "CE domain sealed pre-auth; auth requirement is checked after unlock",
+          "passed": true,
+          "result": {
+            "data": {
+              "domain": "credential-encrypted"
+            },
+            "detail": "CE key unavailable while credential storage is locked",
+            "status": "DENIED_STORAGE_LOCKED",
+            "success": false,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "access before auth"
+        },
+        {
+          "call": [
+            "verify_lockscreen_credential",
+            "correct-mock-pin"
+          ],
+          "checks": [
+            {
+              "actual": true,
+              "check": "success",
+              "expected": true,
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "ce_storage_unlocked": true,
+              "sid": 1
+            },
+            "detail": "credential verified (simulated)",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "authenticate"
+        },
+        {
+          "call": [
+            "begin_operation",
+            "pay_key"
+          ],
+          "checks": [
+            {
+              "actual": true,
+              "check": "success",
+              "expected": true,
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "handle": 1867023981,
+              "handle_hex": "0x6f48866d",
+              "operation_token_sha256": "7ebabc3faf86d05cecbb177bf0f0dbddad852a35814048149bdd685bcfef4637",
+              "requires_confirmation": true
+            },
+            "detail": "operation began (simulated handle)",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "access inside window"
+        },
+        {
+          "call": [
+            "begin_operation",
+            "pay_key",
+            {
+              "$fast_forward": 20.0
+            }
+          ],
+          "checks": [
+            {
+              "actual": false,
+              "check": "success",
+              "expected": false,
+              "ok": true
+            },
+            {
+              "actual": "DENIED_AUTH_REQUIRED",
+              "check": "status",
+              "expected": "DENIED_AUTH_REQUIRED",
+              "ok": true
+            }
+          ],
+          "note": "validity duration exceeded -> re-auth required",
+          "passed": true,
+          "result": {
+            "data": {
+              "elapsed_ms": 20000
+            },
+            "detail": "auth validity window expired (20000ms > 10000ms)",
+            "status": "DENIED_AUTH_REQUIRED",
+            "success": false,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "fast-forward past window"
+        },
+        {
+          "call": [
+            "verify_lockscreen_credential",
+            "correct-mock-pin"
+          ],
+          "checks": [
+            {
+              "actual": true,
+              "check": "success",
+              "expected": true,
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "ce_storage_unlocked": true,
+              "sid": 2
+            },
+            "detail": "credential verified (simulated)",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "re-auth raises SID"
+        },
+        {
+          "call": [
+            "begin_operation",
+            "pay_key"
+          ],
+          "checks": [
+            {
+              "actual": true,
+              "check": "success",
+              "expected": true,
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "handle": 2402810627,
+              "handle_hex": "0x8f37fb03",
+              "operation_token_sha256": "b228773f596cfb799c2b13ea5b2531ec37278eeedc32c6976fe6e40a3d543beb",
+              "requires_confirmation": true
+            },
+            "detail": "operation began (simulated handle)",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "access after re-auth"
+        }
+      ]
+    },
+    {
+      "duration_s": 0.0002,
+      "events": [
+        {
+          "action": "set-mock-credential",
+          "actor": "provisioner",
+          "note": "alias=owner",
+          "outcome": "OK",
+          "t_offset": 0.0
+        },
+        {
+          "action": "verify-credential",
+          "actor": "gatekeeper",
+          "note": "attempt 1",
+          "outcome": "FAILED",
+          "t_offset": 0.0
+        },
+        {
+          "action": "verify-credential",
+          "actor": "gatekeeper",
+          "note": "attempt 2",
+          "outcome": "FAILED",
+          "t_offset": 0.0
+        },
+        {
+          "action": "verify-credential",
+          "actor": "gatekeeper",
+          "note": "attempt 3",
+          "outcome": "FAILED",
+          "t_offset": 0.0
+        },
+        {
+          "action": "verify-credential",
+          "actor": "gatekeeper",
+          "note": "attempt 4",
+          "outcome": "FAILED",
+          "t_offset": 0.0
+        },
+        {
+          "action": "verify-credential",
+          "actor": "gatekeeper",
+          "note": "attempt 5; backoff 30s (weaver=on)",
+          "outcome": "RETRY_TIMEOUT",
+          "t_offset": 0.0
+        },
+        {
+          "action": "verify-credential",
+          "actor": "gatekeeper",
+          "note": "backoff 30.0s",
+          "outcome": "LOCKED",
+          "t_offset": 0.0
+        },
+        {
+          "action": "verify-credential",
+          "actor": "gatekeeper",
+          "note": "sid->1; CE storage unlocked",
+          "outcome": "VERIFIED",
+          "t_offset": 31.0
+        }
+      ],
+      "notes": [],
+      "passed": true,
+      "scenario": "gatekeeper-throttling-model",
+      "steps": [
+        {
+          "call": [
+            "provision_mock_credential",
+            "owner",
+            "correct-mock-pin"
+          ],
+          "checks": [],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "return_type": "NoneType"
+            },
+            "detail": "provision_mock_credential returned NoneType",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "provision credential"
+        },
+        {
+          "call": [
+            "verify_lockscreen_credential",
+            "wrong-mock-pin"
+          ],
+          "checks": [
+            {
+              "actual": false,
+              "check": "success",
+              "expected": false,
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "failed_attempts": 1
+            },
+            "detail": "credential rejected (simulated)",
+            "status": "DENIED_POLICY",
+            "success": false,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "wrong attempt 1"
+        },
+        {
+          "call": [
+            "verify_lockscreen_credential",
+            "wrong-mock-pin"
+          ],
+          "checks": [
+            {
+              "actual": false,
+              "check": "success",
+              "expected": false,
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "failed_attempts": 2
+            },
+            "detail": "credential rejected (simulated)",
+            "status": "DENIED_POLICY",
+            "success": false,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "wrong attempt 2"
+        },
+        {
+          "call": [
+            "verify_lockscreen_credential",
+            "wrong-mock-pin"
+          ],
+          "checks": [
+            {
+              "actual": false,
+              "check": "success",
+              "expected": false,
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "failed_attempts": 3
+            },
+            "detail": "credential rejected (simulated)",
+            "status": "DENIED_POLICY",
+            "success": false,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "wrong attempt 3"
+        },
+        {
+          "call": [
+            "verify_lockscreen_credential",
+            "wrong-mock-pin"
+          ],
+          "checks": [
+            {
+              "actual": false,
+              "check": "success",
+              "expected": false,
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "failed_attempts": 4
+            },
+            "detail": "credential rejected (simulated)",
+            "status": "DENIED_POLICY",
+            "success": false,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "wrong attempt 4"
+        },
+        {
+          "call": [
+            "verify_lockscreen_credential",
+            "wrong-mock-pin"
+          ],
+          "checks": [
+            {
+              "actual": false,
+              "check": "success",
+              "expected": false,
+              "ok": true
+            },
+            {
+              "actual": "DENIED_LOCKED",
+              "check": "status",
+              "expected": "DENIED_LOCKED",
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "backoff_seconds": 30,
+              "failed_attempts": 5
+            },
+            "detail": "too many failures; simulated retry timeout 30s",
+            "status": "DENIED_LOCKED",
+            "success": false,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "threshold hit -> backoff"
+        },
+        {
+          "call": [
+            "verify_lockscreen_credential",
+            "correct-mock-pin"
+          ],
+          "checks": [
+            {
+              "actual": false,
+              "check": "success",
+              "expected": false,
+              "ok": true
+            },
+            {
+              "actual": "DENIED_LOCKED",
+              "check": "status",
+              "expected": "DENIED_LOCKED",
+              "ok": true
+            }
+          ],
+          "note": "backoff timer still running - models rate limiting",
+          "passed": true,
+          "result": {
+            "data": {
+              "failed_attempts": 5
+            },
+            "detail": "temporary lockout active; retry in 30.0s",
+            "status": "DENIED_LOCKED",
+            "success": false,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "immediate retry blocked"
+        },
+        {
+          "call": [
+            "verify_lockscreen_credential",
+            "correct-mock-pin",
+            {
+              "$fast_forward": 31.0
+            }
+          ],
+          "checks": [
+            {
+              "actual": true,
+              "check": "success",
+              "expected": true,
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "ce_storage_unlocked": true,
+              "sid": 1
+            },
+            "detail": "credential verified (simulated)",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "after backoff expires"
+        }
+      ]
+    },
+    {
+      "duration_s": 0.0001,
+      "events": [
+        {
+          "action": "generate:hsm_ref",
+          "actor": "keystore2",
+          "note": "AES-256-GCM@TrustedEnvironment auth_bound=False",
+          "outcome": "OK",
+          "t_offset": 0.0
+        },
+        {
+          "action": "begin:hsm_ref:ENCRYPT",
+          "actor": "keystore2",
+          "note": "handle=0x2fb63b4b level=TrustedEnvironment",
+          "outcome": "GRANTED",
+          "t_offset": 0.0
+        },
+        {
+          "action": "set-boot-state:unverified",
+          "actor": "avb-model",
+          "note": "was verified",
+          "outcome": "OK",
+          "t_offset": 0.0
+        },
+        {
+          "action": "begin:hsm_ref:ENCRYPT",
+          "actor": "keystore2",
+          "note": "rollback-resistant key rejected: current AVB boot state 'unverified' != provisioning state 'verified'",
+          "outcome": "DENIED_POLICY",
+          "t_offset": 0.0
+        }
+      ],
+      "notes": [],
+      "passed": true,
+      "scenario": "avb-rollback-resistant-keys",
+      "steps": [
+        {
+          "call": [
+            "generate_key",
+            "hsm_ref",
+            "AES_GCM",
+            "TrustedEnvironment",
+            false,
+            0,
+            false,
+            "credential-encrypted-direct",
+            true,
+            true
+          ],
+          "checks": [
+            {
+              "actual": true,
+              "check": "success",
+              "expected": true,
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "alias": "hsm_ref",
+              "blob_length": 144,
+              "key_id_hash": "81d06d884581046570cd248f24152dd6"
+            },
+            "detail": "simulated key generated",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "gen RRB key at VERIFIED"
+        },
+        {
+          "call": [
+            "begin_operation",
+            "hsm_ref"
+          ],
+          "checks": [
+            {
+              "actual": true,
+              "check": "success",
+              "expected": true,
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "handle": 800471883,
+              "handle_hex": "0x2fb63b4b",
+              "operation_token_sha256": "01ae27c16f7982d7932cec25b0976121ca2820bf0092928f65af661bd71fbf46",
+              "requires_confirmation": false
+            },
+            "detail": "operation began (simulated handle)",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "access while verified"
+        },
+        {
+          "call": [
+            "_set_boot_state",
+            "unverified"
+          ],
+          "checks": [],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "current": "unverified",
+              "previous": "verified"
+            },
+            "detail": "simulated boot state changed",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "boot state -> UNVERIFIED"
+        },
+        {
+          "call": [
+            "begin_operation",
+            "hsm_ref"
+          ],
+          "checks": [
+            {
+              "actual": false,
+              "check": "success",
+              "expected": false,
+              "ok": true
+            },
+            {
+              "actual": "DENIED_POLICY",
+              "check": "status",
+              "expected": "DENIED_POLICY",
+              "ok": true
+            }
+          ],
+          "note": "rollback protection: key bound to prior boot state",
+          "passed": true,
+          "result": {
+            "data": {
+              "boot_state": "unverified"
+            },
+            "detail": "rollback-resistant key rejected: current AVB boot state 'unverified' != provisioning state 'verified'",
+            "status": "DENIED_POLICY",
+            "success": false,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "access after unlock"
+        }
+      ]
+    },
+    {
+      "duration_s": 0.0002,
+      "events": [
+        {
+          "action": "set-mock-credential",
+          "actor": "provisioner",
+          "note": "alias=owner",
+          "outcome": "OK",
+          "t_offset": 0.0
+        },
+        {
+          "action": "verify-credential",
+          "actor": "gatekeeper",
+          "note": "sid->1; CE storage unlocked",
+          "outcome": "VERIFIED",
+          "t_offset": 0.0
+        },
+        {
+          "action": "generate:file_key",
+          "actor": "keystore2",
+          "note": "AES-256-XTS@Software auth_bound=False",
+          "outcome": "OK",
+          "t_offset": 0.0
+        },
+        {
+          "action": "begin:file_key:ENCRYPT",
+          "actor": "keystore2",
+          "note": "handle=0x369146f3 level=Software",
+          "outcome": "GRANTED",
+          "t_offset": 0.0
+        }
+      ],
+      "notes": [],
+      "passed": true,
+      "scenario": "keystore-handle-confirmation",
+      "steps": [
+        {
+          "call": [
+            "provision_mock_credential",
+            "owner",
+            "pw"
+          ],
+          "checks": [],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "return_type": "NoneType"
+            },
+            "detail": "provision_mock_credential returned NoneType",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "provision credential"
+        },
+        {
+          "call": [
+            "verify_lockscreen_credential",
+            "pw"
+          ],
+          "checks": [
+            {
+              "actual": true,
+              "check": "success",
+              "expected": true,
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "ce_storage_unlocked": true,
+              "sid": 1
+            },
+            "detail": "credential verified (simulated)",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "unlock"
+        },
+        {
+          "call": [
+            "generate_key",
+            "file_key",
+            "AES_XTS",
+            "Software",
+            false,
+            0,
+            false,
+            "credential-encrypted"
+          ],
+          "checks": [
+            {
+              "actual": true,
+              "check": "success",
+              "expected": true,
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "alias": "file_key",
+              "blob_length": 144,
+              "key_id_hash": "9824781d395eb05e6d85609d9465ee03"
+            },
+            "detail": "simulated key generated",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "gen plain key"
+        },
+        {
+          "call": [
+            "begin_operation",
+            "file_key"
+          ],
+          "checks": [
+            {
+              "actual": true,
+              "check": "success",
+              "expected": true,
+              "ok": true
+            }
+          ],
+          "note": "",
+          "passed": true,
+          "result": {
+            "data": {
+              "handle": 915490547,
+              "handle_hex": "0x369146f3",
+              "operation_token_sha256": "b268433b27d6e07bf3d6183f0f416a2dcb950e4f51e587e2e43ecf0c283db63a",
+              "requires_confirmation": false
+            },
+            "detail": "operation began (simulated handle)",
+            "status": "GRANTED",
+            "success": true,
+            "timestamp": "2026-10-21T07:13:19.070+00:00"
+          },
+          "step": "begin op"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,422 @@
+<!DOCTYPE html><html lang='en'><head><meta charset='utf-8'><title>Kernel-X Academic Security Report</title><style>body{font-family:'Segoe UI',Roboto,sans-serif;max-width:960px;margin:2rem auto;padding:0 1rem;color:#111;background:#fff;line-height:1.45}table{border-collapse:collapse;width:100%;margin:1rem 0}th,td{border:1px solid #ccc;padding:6px 8px;font-size:13px;text-align:left}code{background:#f4f4f4;padding:1px 4px;border-radius:3px}pre{background:#f4f4f4;padding:12px;overflow:auto;border-radius:6px}h1,h2{border-bottom:1px solid #ddd;padding-bottom:4px}@media print{a{color:#111}}</style></head><body><pre># Android Kernel Security Posture Assessment
+
+**Session:** `demo-001` · **Generated:** 2026-10-21T07:13:19+00:00 · **Schema:** `kx-report/1.0`
+
+**Authors:** Security Architecture Research Group — Autonomous Systems Security Lab
+
+---
+
+## Abstract
+
+This audit characterises the kernel-level security posture of a **Samsung SM-G986B** running Android 11 (SDK 30) on a **Samsung Exynos** SoC with Linux kernel `5.10.134-013.15.kangaroo.al8.x86_64` (non-GKI / vendor kernel). Static telemetry was mapped against a curated knowledge base of 20 publicly documented vulnerability surface areas, yielding a normalized risk score of **9.38/10.0 (CRITICAL)**. 5 dry-run scenario batteries were executed to model FBE, keystore-policy and credential-verifier boundary behaviour. No live attack path was exercised or attempted.
+
+## 1. Methodology
+
+1. **Telemetry acquisition** — read-only collection of `/proc/version`, `/proc/cpuinfo`, `/sys/devices/soc0/*`, `/proc/cmdline`, kernel config (`/proc/config.gz` or `/boot/config-*`) and Android properties (`getprop` or injected lab dictionary).
+2. **Surface correlation** — kernel series + subsystem configuration matched against the local CVE knowledge base; tri-state applicability (present / absent / unverifiable).
+3. **Scoring** — `impact × reachability × exploit-maturity × applicability × patch-decay`, complement-aggregated and mitigation-adjusted (formula in Appendix A).
+4. **Dry-run modelling** — declarative scenarios exercise the in-process keystore/FBE/Gatekeeper state machines; only policy outcomes are recorded.
+5. **Reporting** — canonical JSON + Markdown export with integrity digest and citations.
+
+## 2. Device Fingerprint
+
+| Attribute | Observed value |
+|---|---|
+| Device | Samsung SM-G986B (SM-G986B) |
+| Android / SDK | 11 / 30 |
+| Security patch level | 2021-05-01 (1999 days old) |
+| Kernel version | `5.10.134-013.15.kangaroo.al8.x86_64` (series 5.10) |
+| Kernel flavour | non-GKI / vendor kernel |
+| SoC | Samsung — Exynos (soc_id=unknown, hw=exynos9825) |
+| Architecture | x86_64 |
+| Bootloader / AVB | unlocked / AVB 2.0 (verifiedbootstate=orange, verity=unknown) |
+| Storage encryption | file — content `aes-256-xts:integrity:aes-256-cts`, metadata `aes-256-xts` |
+| FBE token model | none/unencrypted |
+| Keystore backend | keymaster 4.x HAL (Weaver: unspecified) |
+| SELinux posture | enforcing assumptions hold (as far as observable) |
+| Kconfig visibility | no |
+| Build type | n/a |
+
+## 3. Vulnerability Surface &amp; Risk
+
+**Normalized risk score:** `9.38/10.0` → **CRITICAL**
+
+`[###################.]` 0 ──── 10
+
+Raw aggregate `8.934` · mitigation net credit `0.05` · patch decay `1.0` (patch level 1999d old - stale)
+
+### 3.1 Subsystem exposure heatmap
+
+| Subsystem | Contribution | Heat |
+|---|---:|---|
+| `exynos-lpa` | 3.27 | `[####........]` |
+| `core-mm-pipe` | 2.36 | `[###.........]` |
+| `ebpf-verifier` | 2.11 | `[###.........]` |
+| `core-mm-numa` | 2.11 | `[###.........]` |
+| `core-netfilter` | 1.65 | `[##..........]` |
+| `mediatek-hypervisor` | 1.62 | `[##..........]` |
+| `framework-profiler` | 1.53 | `[##..........]` |
+| `core-net-route` | 1.48 | `[##..........]` |
+| `core-net-filter` | 1.48 | `[##..........]` |
+| `mediadrm` | 1.29 | `[##..........]` |
+| `ion-dmabuf` | 0.59 | `[#...........]` |
+| `usb-gadget` | 0.54 | `[#...........]` |
+
+### 3.2 Findings register
+
+| CVE | Subsystem | Status | CVSS impact | Maturity | Contrib. | Confidence |
+|---|---|---|---:|---|---:|---:|
+| [CVE-2022-20172](https://security.samsungmobile.com/workSMSrv.do) | `exynos-lpa` | EXPOSED-CANDIDATE | 5.9 | poc | 3.27 | 1.00 |
+| [CVE-2022-0847](https://nvd.nist.gov/vuln/detail/CVE-2022-0847) | `core-mm-pipe` | EXPOSED-CANDIDATE | 5.9 | weaponized-in-wild | 2.36 | 1.00 |
+| [CVE-2021-3489](https://nvd.nist.gov/vuln/detail/CVE-2021-3489) | `ebpf-verifier` | EXPOSED-CANDIDATE | 5.9 | poc | 2.11 | 1.00 |
+| [CVE-2023-0384](https://nvd.nist.gov/vuln/detail/CVE-2023-0384) | `core-mm-numa` | EXPOSED-CANDIDATE | 5.9 | poc | 2.11 | 1.00 |
+| [CVE-2023-32254](https://nvd.nist.gov/vuln/detail/CVE-2023-32254) | `core-netfilter` | EXPOSED-CANDIDATE | 5.9 | weaponized-in-wild | 1.65 | 0.70 |
+| [CVE-2022-20445](https://source.android.com/docs/security/bulletin/2022-07-01) | `mediatek-hypervisor` | EXPOSED-CANDIDATE | 5.9 | unknown | 1.62 | 1.00 |
+| [CVE-2023-20947](https://source.android.com/docs/security/bulletin/2023-03-01) | `framework-profiler` | EXPOSED-CANDIDATE | 3.6 | unknown | 1.53 | 1.00 |
+| [CVE-2022-2588](https://nvd.nist.gov/vuln/detail/CVE-2022-2588) | `core-net-route` | EXPOSED-CANDIDATE | 5.9 | poc | 1.48 | 0.70 |
+| [CVE-2022-2586](https://nvd.nist.gov/vuln/detail/CVE-2022-2586) | `core-net-filter` | EXPOSED-CANDIDATE | 5.9 | poc | 1.48 | 0.70 |
+| [CVE-2021-39633](https://source.android.com/docs/security/bulletin/2021-11-01) | `mediadrm` | EXPOSED-CANDIDATE | 3.6 | poc | 1.29 | 1.00 |
+| [CVE-2019-2025](https://nvd.nist.gov/vuln/detail/CVE-2019-2025) | `ion-dmabuf` | LIKELY-PATCHED | 5.9 | weaponized-in-wild | 0.59 | 0.25 |
+| [CVE-2021-0704](https://source.android.com/docs/security/bulletin/2021-06-01) | `usb-gadget` | EXPOSED-CANDIDATE | 5.9 | poc | 0.54 | 0.70 |
+
+### 3.3 Rationale per finding
+
+- **CVE-2022-20172 — Samsung Exynos baseband/proxy ABI weakness class affecting AP-side IPC endpoints**
+  - Applicability: kernel series within documented range 4.9 .. 5.115; declared patch level 2021-05-01 predates the 2022-09-05 fix bulletin; patch level 1999d old - stale
+  - Affected kernel range: `4.9 .. 5.115` · vector `CVSS:3.1/AV:N/AC:L/UI:N/S:U/C:H/I:H/A:H`
+  - Remediation: Apply Samsung maintenance release &gt;= 2022-09; disable dormant modem proxy services.
+- **CVE-2022-0847 — Dirty Pipe - pipe buffer flag corruption enables overwrite of cached files**
+  - Applicability: kernel series within documented range 5.8 .. 5.29; declared patch level 2021-05-01 predates the 2022-03-05 fix bulletin; patch level 1999d old - stale
+  - Affected kernel range: `5.8 .. 5.29` · vector `CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H`
+  - Remediation: Update the kernel to &gt;= 5.10.102 / 5.15.25 / 5.16.11 and apply the 2022-03 Android Security Bulletin; deploy GKI 5.10 LTS builds.
+- **CVE-2021-3489 — eBPF signed-divide register-bound miscomputation permits out-of-bounds map access**
+  - Applicability: kernel series within documented range 4.14 .. 5.52; eBPF syscall surface present; declared patch level 2021-05-01 predates the 2021-09-05 fix bulletin; patch level 1999d old - stale
+  - Affected kernel range: `4.14 .. 5.52` · vector `CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H`
+  - Remediation: Update to &gt;= 5.12.4 / apply 2021-09 bulletin; disable unprivileged BPF where unused.
+- **CVE-2023-0384 — MPOL_BIND NUMA policy integer underflow leading to out-of-bounds page-table write**
+  - Applicability: kernel series within documented range 5.8 .. 6.21; declared patch level 2021-05-01 predates the 2023-03-05 fix bulletin; patch level 1999d old - stale
+  - Affected kernel range: `5.8 .. 6.21` · vector `CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H`
+  - Remediation: Update to &gt;= 6.1.21 / apply the 2023-03 bulletin.
+- **CVE-2023-32254 — nf_tables anonymous set tracking use-after-free during GC (net-admin reachable)**
+  - Applicability: kernel series within documented range 5.9 .. 6.5; CONFIG_NETFILTER unverifiable (kconfig unavailable); declared patch level 2021-05-01 predates the 2023-06-05 fix bulletin; patch level 1999d old - stale
+  - Affected kernel range: `5.9 .. 6.5` · vector `CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H`
+  - Remediation: Update to &gt;= 6.3.2 / apply the 2023-06 bulletin; confine nftables to trusted uids.
+- **CVE-2022-20445 — MediaTek hypervisor IPC input-validation weakness (vELM message boundary)**
+  - Applicability: kernel series within documented range 4.14 .. 5.115; declared patch level 2021-05-01 predates the 2022-07-05 fix bulletin; patch level 1999d old - stale
+  - Affected kernel range: `4.14 .. 5.115` · vector `CVSS:3.1/AV:L/AC:L/UI:N/S:C/C:H/I:H/A:H`
+  - Remediation: Apply MediaTek OEM BSP update from the 2022-07 bulletin.
+- **CVE-2023-20947 — System server information disclosure via profiler state leakage to untrusted apps**
+  - Applicability: kernel series within documented range 0.0 .. 99.0; declared patch level 2021-05-01 predates the 2023-03-05 fix bulletin; patch level 1999d old - stale
+  - Affected kernel range: `0.0 .. 99.0` · vector `CVSS:3.1/AV:N/AC:L/UI:N/S:U/C:H/I:N/A:N`
+  - Remediation: Apply the 2023-03 bulletin; restrict ProfilerInfo to privileged callers.
+- **CVE-2022-2588 — Classic eBPF route-key use-after-free in xfrm garbage collection (netns-local)**
+  - Applicability: kernel series within documented range 4.4 .. 5.38; CONFIG_XFRM unverifiable (kconfig unavailable); declared patch level 2021-05-01 predates the 2022-08-05 fix bulletin; patch level 1999d old - stale
+  - Affected kernel range: `4.4 .. 5.38` · vector `CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H`
+  - Remediation: Update to &gt;= 5.18.19 / apply the 2022-08 bulletin; namespace xfrm exposure.
+- **CVE-2022-2586 — cls_route refcount leak in TC route classifier enabling use-after-free**
+  - Applicability: kernel series within documented range 4.0 .. 5.48; CONFIG_NETFILTER unverifiable (kconfig unavailable); declared patch level 2021-05-01 predates the 2022-08-05 fix bulletin; patch level 1999d old - stale
+  - Affected kernel range: `4.0 .. 5.48` · vector `CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H`
+  - Remediation: Update to &gt;= 5.18.15; restrict CAP_NET_ADMIN to netd/privileged domains.
+- **CVE-2021-39633 — MediaCodecs privileged information disclosure through uninitialized memory read**
+  - Applicability: kernel series within documented range 0.0 .. 99.0; declared patch level 2021-05-01 predates the 2021-11-05 fix bulletin; patch level 1999d old - stale
+  - Affected kernel range: `0.0 .. 99.0` · vector `CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:N/A:N`
+  - Remediation: Apply the 2021-11 bulletin (framework/media codec hardening).
+- **CVE-2019-2025 — ION improper release of unmapped pages allows DMA-BUF reuse after free (UAF class)**
+  - Applicability: kernel series within documented range 4.0 .. 5.204; legacy ION allocator indicated; declared patch level 2021-05-01 postdates the 2020-09-05 fix bulletin - remediation expected present; patch level 1999d old - stale
+  - Affected kernel range: `4.0 .. 5.204` · vector `CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H`
+  - Remediation: Migrate from legacy ION to the dma-buf heaps framework (&gt;= 5.4) and apply the 2020-09 bulletin.
+- **CVE-2021-0704 — USB gadget functionfs improper input validation in vendor descriptor path**
+  - Applicability: kernel series within documented range 4.4 .. 5.114; CONFIG_USB_GADGET unverifiable (kconfig unavailable); declared patch level 2021-05-01 predates the 2021-06-05 fix bulletin; patch level 1999d old - stale
+  - Affected kernel range: `4.4 .. 5.114` · vector `CVSS:3.1/AV:P/AC:L/UI:N/S:U/C:H/I:H/A:H`
+  - Remediation: Apply the 2021-06 bulletin; disable ADB-over-USB in production builds.
+
+### 3.4 Mitigation credit ledger
+
+| Factor | Credit |
+|---|---:|
+| verified_boot | +0.00 |
+| selinux_enforcing | +0.05 |
+| modern_fbe | +0.10 |
+| gki_lts | +0.00 |
+| recent_patch | +0.00 |
+| dmabuf_heaps | +0.00 |
+| risk_penalties | -0.10 |
+
+## 4. Recommendations (defensive)
+
+1. Track the latest Android Security Bulletin and OTA baseline; patch age is the single strongest predictor of aggregate kernel exposure.
+2. Prioritize monitoring/verification for the highest-contributing subsystems: core-mm-numa, core-mm-pipe, ebpf-verifier, exynos-lpa.
+3. Verify the 2022-03 (Dirty Pipe) fix is present in the running kernel build via the vendor changelog rather than the version string alone.
+4. Prefer builds that replace legacy ION with dma-buf heaps and constrain heap access with SELinux genfs contexts.
+5. Set kernel.unprivileged_bpf_disabled=1 (or 2 on &gt;= 5.8) and restrict BPF program loading to trusted domains.
+6. Re-lock the bootloader for production evaluation units: an unlocked device invalidates AVB trust assumptions across the whole assessment.
+7. Restore/verify the AVB chain-of-trust (vbmeta digest, rollback protection indexes) before drawing conclusions about boot-path integrity.
+8. All findings are *candidates* derived from static version/config correlation; confirm each via vendor source changelogs before publication.
+
+## 5. Simulated Boundary Behaviour (dry-run)
+
+All events below originate from the in-process model; no hardware-backed service was contacted and no real credential verification was attempted.
+
+### 5.x Scenario `fbe-direct-boot-vs-credential-storage` — **PASS** (10 steps, 0.0004s)
+
+| t (s) | Actor | Action | Outcome | Note |
+|---:|---|---|---|---|
+| 0.000 | `keystore2` | `generate:de_store` | OK | AES-256-GCM@TrustedEnvironment auth_bound=False |
+| 0.000 | `keystore2` | `generate:ce_store` | OK | AES-256-GCM@TrustedEnvironment auth_bound=False |
+| 0.000 | `keystore2` | `begin:de_store:ENCRYPT` | GRANTED | handle=0xe25a252f level=TrustedEnvironment |
+| 0.000 | `keystore2` | `begin:ce_store:ENCRYPT` | DENIED_STORAGE_LOCKED | CE key unavailable while credential storage is locked |
+| 0.000 | `gatekeeper` | `verify-credential` | FAILED | attempt 1 |
+| 0.000 | `keystore2` | `begin:ce_store:ENCRYPT` | DENIED_STORAGE_LOCKED | CE key unavailable while credential storage is locked |
+| 0.000 | `provisioner` | `set-mock-credential` | OK | alias=owner |
+| 0.000 | `gatekeeper` | `verify-credential` | VERIFIED | sid-&gt;1; CE storage unlocked |
+| 0.000 | `keystore2` | `begin:ce_store:ENCRYPT` | GRANTED | handle=0xe80f9fec level=TrustedEnvironment |
+
+### 5.x Scenario `auth-bound-key-lifetime` — **PASS** (8 steps, 0.0002s)
+
+| t (s) | Actor | Action | Outcome | Note |
+|---:|---|---|---|---|
+| 0.000 | `provisioner` | `set-mock-credential` | OK | alias=owner |
+| 0.000 | `keystore2` | `generate:pay_key` | OK | ECDSA-P256@StrongBox auth_bound=True |
+| 0.000 | `keystore2` | `begin:pay_key:ENCRYPT` | DENIED_STORAGE_LOCKED | CE key unavailable while credential storage is locked |
+| 0.000 | `gatekeeper` | `verify-credential` | VERIFIED | sid-&gt;1; CE storage unlocked |
+| 0.000 | `keystore2` | `begin:pay_key:ENCRYPT` | GRANTED | handle=0x6f48866d level=StrongBox |
+| 20.000 | `keystore2` | `begin:pay_key:ENCRYPT` | DENIED_AUTH_REQUIRED | auth validity window expired (20000ms &gt; 10000ms) |
+| 20.000 | `gatekeeper` | `verify-credential` | VERIFIED | sid-&gt;2; CE storage already unlocked |
+| 20.000 | `keystore2` | `begin:pay_key:ENCRYPT` | GRANTED | handle=0x8f37fb03 level=StrongBox |
+
+### 5.x Scenario `gatekeeper-throttling-model` — **PASS** (8 steps, 0.0002s)
+
+| t (s) | Actor | Action | Outcome | Note |
+|---:|---|---|---|---|
+| 0.000 | `provisioner` | `set-mock-credential` | OK | alias=owner |
+| 0.000 | `gatekeeper` | `verify-credential` | FAILED | attempt 1 |
+| 0.000 | `gatekeeper` | `verify-credential` | FAILED | attempt 2 |
+| 0.000 | `gatekeeper` | `verify-credential` | FAILED | attempt 3 |
+| 0.000 | `gatekeeper` | `verify-credential` | FAILED | attempt 4 |
+| 0.000 | `gatekeeper` | `verify-credential` | RETRY_TIMEOUT | attempt 5; backoff 30s (weaver=on) |
+| 0.000 | `gatekeeper` | `verify-credential` | LOCKED | backoff 30.0s |
+| 31.000 | `gatekeeper` | `verify-credential` | VERIFIED | sid-&gt;1; CE storage unlocked |
+
+### 5.x Scenario `avb-rollback-resistant-keys` — **PASS** (4 steps, 0.0001s)
+
+| t (s) | Actor | Action | Outcome | Note |
+|---:|---|---|---|---|
+| 0.000 | `keystore2` | `generate:hsm_ref` | OK | AES-256-GCM@TrustedEnvironment auth_bound=False |
+| 0.000 | `keystore2` | `begin:hsm_ref:ENCRYPT` | GRANTED | handle=0x2fb63b4b level=TrustedEnvironment |
+| 0.000 | `avb-model` | `set-boot-state:unverified` | OK | was verified |
+| 0.000 | `keystore2` | `begin:hsm_ref:ENCRYPT` | DENIED_POLICY | rollback-resistant key rejected: current AVB boot state 'unverified' != provisioning state 'verified' |
+
+### 5.x Scenario `keystore-handle-confirmation` — **PASS** (4 steps, 0.0002s)
+
+| t (s) | Actor | Action | Outcome | Note |
+|---:|---|---|---|---|
+| 0.000 | `provisioner` | `set-mock-credential` | OK | alias=owner |
+| 0.000 | `gatekeeper` | `verify-credential` | VERIFIED | sid-&gt;1; CE storage unlocked |
+| 0.000 | `keystore2` | `generate:file_key` | OK | AES-256-XTS@Software auth_bound=False |
+| 0.000 | `keystore2` | `begin:file_key:ENCRYPT` | GRANTED | handle=0x369146f3 level=Software |
+
+## 6. Plugin Contributions
+
+### `_knowledge_base_digest`
+
+```
+32264ae664c0af29
+```
+
+## Appendix A — Scoring Model
+
+```
+contribution_i = Impact_i × Reachability_i × Maturity_i × Applicability_i × PatchDecay
+Impact_i         = clamp(6.42 × ISCBase_i, 1, 10)      # CVSS 3.1 subscore approximation
+Reachability_i   = clamp(AV × AC × UI / 0.85, 0.15, 1)
+RiskScore        = clamp(10 × (1 − Π(1 − contribution_i / 10)) × (1 + ΣCredit), 0, 10)
+```
+
+Reports embed an environment hash and a knowledge-base digest. Re-running the
+same toolkit build against the same fingerprint input reproduces byte-identical
+canonical JSON (modulo wall-clock fields), enabling third-party replication of
+the quantitative sections.
+
+
+## Appendix B — Reproducibility &amp; Integrity
+
+- Environment SHA-256: `10d2e25796dab26a28d994fcb41ec4ef38af4cd59e83b4bcdc1e69a954312c08`
+- Platform: Linux 5.10.134-013.15.kangaroo.al8.x86_64 (x86_64), Python 3.12.10
+- Toolkit git revision: `28847c1`
+- Knowledge-base digest: `n/a`
+- Canonical body SHA-256: `b8271417e7522d5cc5eb51c38193e099f0149013c3edfbc54bd706dd912c1398`
+- Session opened: 2026-10-21T07:13:19.070715+00:00 · report generated: 2026-10-21T07:13:19+00:00
+
+Verify with: `sha256sum` over the canonical JSON body (see `verify_artifact`).
+
+## Appendix C — Citations (BibTeX)
+
+```bibtex
+@misc{android-security-bulletin,
+  title         = {Android Security Bulletin},
+  author        = {{Android Open Source Project}},
+  year          = {2025},
+  howpublished = {https://source.android.com/docs/security/bulletin},
+  note          = {Monthly coordinated-disclosure advisories},
+}
+
+@misc{aosp-fbe,
+  title         = {File-Based Encryption (FBE) architecture},
+  author        = {{Android Open Source Project}},
+  year          = {2024},
+  howpublished = {https://source.android.com/docs/security/features/encryption},
+}
+
+@misc{aosp-gki,
+  title         = {Generic Kernel Image (GKI) architecture},
+  author        = {{Android Open Source Project}},
+  year          = {2024},
+  howpublished = {https://source.android.com/docs/core/architecture/kernel/generic-kernel-image},
+}
+
+@misc{keymint-spec,
+  title         = {KeyMint (Keys through the Trustworthy Execution Environment) HAL specification},
+  author        = {{Android Open Source Project}},
+  year          = {2024},
+  howpublished = {https://developer.android.com/reference/android/hardware/security/keymint},
+}
+
+@article{cvss31,
+  title  = {Common Vulnerability Scoring System v3.1 Specification},
+  author = {{FIRST.org}},
+  year   = {2019},
+  journal= {FIRST CV-SIG},
+  url    = {https://www.first.org/cvss/v3.1/specification-document},
+}
+
+@software{kernel-x-toolkit,
+  title   = {Android Kernel Security Posture Assessment},
+  author  = {Security Architecture Research Group},
+  year    = {2026},
+  version = {2.0.0},
+  note    = {Session demo-001; knowledge-base digest 32264ae664c0af29},
+}
+
+@misc{cve202220172,
+  title         = {CVE-2022-20172: Samsung Exynos baseband/proxy ABI weakness class affecting AP-side IPC endpoints},
+  author        = {exynos-lpa maintainers / NVD},
+  year          = {2022},
+  howpublished = {https://security.samsungmobile.com/workSMSrv.do},
+  note          = {CVSS vector CVSS:3.1/AV:N/AC:L/UI:N/S:U/C:H/I:H/A:H; mapped status EXPOSED-CANDIDATE},
+}
+
+@misc{cve20220847,
+  title         = {CVE-2022-0847: Dirty Pipe - pipe buffer flag corruption enables overwrite of cached files},
+  author        = {core-mm-pipe maintainers / NVD},
+  year          = {2022},
+  howpublished = {https://nvd.nist.gov/vuln/detail/CVE-2022-0847},
+  note          = {CVSS vector CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H; mapped status EXPOSED-CANDIDATE},
+}
+
+@misc{cve20213489,
+  title         = {CVE-2021-3489: eBPF signed-divide register-bound miscomputation permits out-of-bounds map access},
+  author        = {ebpf-verifier maintainers / NVD},
+  year          = {2021},
+  howpublished = {https://nvd.nist.gov/vuln/detail/CVE-2021-3489},
+  note          = {CVSS vector CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H; mapped status EXPOSED-CANDIDATE},
+}
+
+@misc{cve20230384,
+  title         = {CVE-2023-0384: MPOL_BIND NUMA policy integer underflow leading to out-of-bounds page-table write},
+  author        = {core-mm-numa maintainers / NVD},
+  year          = {2023},
+  howpublished = {https://nvd.nist.gov/vuln/detail/CVE-2023-0384},
+  note          = {CVSS vector CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H; mapped status EXPOSED-CANDIDATE},
+}
+
+@misc{cve202332254,
+  title         = {CVE-2023-32254: nf_tables anonymous set tracking use-after-free during GC (net-admin reachable)},
+  author        = {core-netfilter maintainers / NVD},
+  year          = {2023},
+  howpublished = {https://nvd.nist.gov/vuln/detail/CVE-2023-32254},
+  note          = {CVSS vector CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H; mapped status EXPOSED-CANDIDATE},
+}
+
+@misc{cve202220445,
+  title         = {CVE-2022-20445: MediaTek hypervisor IPC input-validation weakness (vELM message boundary)},
+  author        = {mediatek-hypervisor maintainers / NVD},
+  year          = {2022},
+  howpublished = {https://source.android.com/docs/security/bulletin/2022-07-01},
+  note          = {CVSS vector CVSS:3.1/AV:L/AC:L/UI:N/S:C/C:H/I:H/A:H; mapped status EXPOSED-CANDIDATE},
+}
+
+@misc{cve202320947,
+  title         = {CVE-2023-20947: System server information disclosure via profiler state leakage to untrusted apps},
+  author        = {framework-profiler maintainers / NVD},
+  year          = {2023},
+  howpublished = {https://source.android.com/docs/security/bulletin/2023-03-01},
+  note          = {CVSS vector CVSS:3.1/AV:N/AC:L/UI:N/S:U/C:H/I:N/A:N; mapped status EXPOSED-CANDIDATE},
+}
+
+@misc{cve20222588,
+  title         = {CVE-2022-2588: Classic eBPF route-key use-after-free in xfrm garbage collection (netns-local)},
+  author        = {core-net-route maintainers / NVD},
+  year          = {2022},
+  howpublished = {https://nvd.nist.gov/vuln/detail/CVE-2022-2588},
+  note          = {CVSS vector CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H; mapped status EXPOSED-CANDIDATE},
+}
+
+@misc{cve20222586,
+  title         = {CVE-2022-2586: cls_route refcount leak in TC route classifier enabling use-after-free},
+  author        = {core-net-filter maintainers / NVD},
+  year          = {2022},
+  howpublished = {https://nvd.nist.gov/vuln/detail/CVE-2022-2586},
+  note          = {CVSS vector CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H; mapped status EXPOSED-CANDIDATE},
+}
+
+@misc{cve202139633,
+  title         = {CVE-2021-39633: MediaCodecs privileged information disclosure through uninitialized memory read},
+  author        = {mediadrm maintainers / NVD},
+  year          = {2021},
+  howpublished = {https://source.android.com/docs/security/bulletin/2021-11-01},
+  note          = {CVSS vector CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:N/A:N; mapped status EXPOSED-CANDIDATE},
+}
+
+@misc{cve20192025,
+  title         = {CVE-2019-2025: ION improper release of unmapped pages allows DMA-BUF reuse after free (UAF class)},
+  author        = {ion-dmabuf maintainers / NVD},
+  year          = {2019},
+  howpublished = {https://nvd.nist.gov/vuln/detail/CVE-2019-2025},
+  note          = {CVSS vector CVSS:3.1/AV:L/AC:L/UI:N/S:U/C:H/I:H/A:H; mapped status LIKELY-PATCHED},
+}
+
+@misc{cve20210704,
+  title         = {CVE-2021-0704: USB gadget functionfs improper input validation in vendor descriptor path},
+  author        = {usb-gadget maintainers / NVD},
+  year          = {2021},
+  howpublished = {https://source.android.com/docs/security/bulletin/2021-06-01},
+  note          = {CVSS vector CVSS:3.1/AV:P/AC:L/UI:N/S:U/C:H/I:H/A:H; mapped status EXPOSED-CANDIDATE},
+}
+```
+
+---
+
+## Ethical &amp; Scope Disclaimer
+
+This document was produced by **Kernel-X Research Toolkit**, an *observational*
+security-analysis instrument intended for academic study, defensive hardening
+and audit documentation. Its outputs are derived exclusively from static
+telemetry, publicly published advisories and in-process simulations.
+
+The toolkit is **not** an exploitation framework. It contains no exploit code,
+performs no memory access (`/dev/mem`, `/dev/kmem`, ptrace) and issues no
+commands against hardware-backed security services (KeyMint/keystore2,
+Gatekeeper, Weaver). All "simulation" results describe *modelled* behaviour of
+documented Android/Linux security boundaries; they do not constitute,
+endorse, or assist unauthorised access to any device or account.
+
+Research described here must comply with applicable law and institutional
+policy (e.g., ACM/IEEE code of ethics, CFAA/EU Directive 2013/40/EU, and your
+IRB/ethics-board approval). Only assess systems you own or have explicit,
+written authorisation to test, and follow coordinated-disclosure timelines when
+reporting real vulnerabilities. Findings herein are *correlation-based
+candidates*; verify against vendor changelogs before disclosure or publication.
+
+
+*Generated by Kernel-X Research Toolkit — session `demo-001`.*
+</pre></body></html>
