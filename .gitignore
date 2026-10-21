@@ -1,14 +1,7 @@
-# Binaries and Compiled files
-*.o
-*.out
-bin/
-
-# Android NDK / Build files
-obj/
-libs/
-.externalNativeBuild/
-
-# Temp and Logs
-logs/
+__pycache__/
+*.pyc
 *.log
-.DS_Store
+*.tmp
+.env
+.env.local
+*.env.*
