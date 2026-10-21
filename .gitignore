@@ -1,7 +1,1 @@
-__pycache__/
-*.pyc
-*.log
-*.tmp
-.env
-.env.local
-*.env.*
+bin/
