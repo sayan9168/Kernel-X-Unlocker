@@ -24,6 +24,19 @@
  * Nothing here writes to any partition, bootloader, or memory of another
  * process. Standard C11 only; compiles clean under -Wall -Wextra.
  */
+
+/* Feature-test macros MUST precede every #include so that glibc exposes
+ * POSIX/GNU declarations (O_CLOEXEC, localtime_r) under -std=c11. */
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE 1
+#endif
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE 1
+#endif
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200809L
+#endif
+
 #include <errno.h>
 #include <fcntl.h>
 #include <stdint.h>
