@@ -35,6 +35,8 @@ JSON output
 from __future__ import annotations
 
 import argparse
+import ctypes
+import ctypes.util
 import json
 import logging
 import math
@@ -299,6 +301,9 @@ def _enumerate_regions(pid: int) -> List[RegionInfo]:
                 if not m:
                     continue
                 start, end = int(m.group(1), 16), int(m.group(2), 16)
+                # Permission fields are single characters: 'r' or '-', 'w' or
+                # '-', 'x' or '-'. A region is readable iff the char is 'r'
+                # (NOT whether the group itself is truthy - '-' is truthy too).
                 regions.append(RegionInfo(
                     addr_start=start,
                     addr_end=end,
@@ -317,11 +322,51 @@ def _enumerate_regions(pid: int) -> List[RegionInfo]:
     return regions
 
 
+# ---------------------------------------------------------------------------
+# ctypes-backed pread(2): positional reads of /proc/<pid>/mem.
+#
+# Why pread instead of lseek+read?  A single atomic positional read cannot be
+# torn by an intervening seek and, crucially, a faulted page in the target's
+# address space makes pread return -1/EFAULT (or a short count) *in kernel
+# space* - it never raises SIGSEGV in our scanner process. That is the core
+# "non-intrusive" guarantee: we touch no target page beyond what the kernel
+# already permits, attach no debugger, and send no signals.
+# ---------------------------------------------------------------------------
+_LIBC = None
+try:  # pragma: no cover - platform dependent
+    _libc_name = ctypes.util.find_library("c") or "libc"
+    _LIBC = ctypes.CDLL(_libc_name, use_errno=True)
+    _LIBC.pread.restype = ctypes.c_ssize_t
+    _LIBC.pread.argtypes = [
+        ctypes.c_int,                    # fd          (O_RDONLY only)
+        ctypes.c_void_p,                 # buf
+        ctypes.c_size_t,                 # count
+        ctypes.c_longlong,               # offset (off_t)
+    ]
+except (OSError, AttributeError):  # pragma: no cover
+    logger.debug("ctypes libc pread binding unavailable; using os.pread fallback")
+
+
 def _safe_read_mem(fd: int, addr: int, length: int) -> Optional[bytes]:
     """Read `length` bytes at `addr`; return None on any kernel-level fault."""
+    if length <= 0:
+        return None
     try:
-        os.lseek(fd, addr, os.SEEK_SET)
-        data = os.read(fd, length)
+        if _LIBC is not None:
+            buf = ctypes.create_string_buffer(length)
+            got = _LIBC.pread(fd, buf, ctypes.c_size_t(length),
+                              ctypes.c_longlong(addr))
+            if got and got > 0:
+                return buf.raw[:int(got)]
+            # got <= 0: EFAULT / EPERM / short read - skip range, never retry
+            # aggressively (aggressive retries are what destabilise lab hosts).
+            if got is not None and got < 0:
+                errno_val = ctypes.get_errno()
+                logger.debug("pread fault @0x%x errno=%d - skipping range safely",
+                             addr, errno_val)
+            return None
+        # Fallback path for platforms without a usable libc binding.
+        data = os.pread(fd, length, addr)
         return data if data else None
     except (OSError, ValueError, OverflowError) as exc:
         logger.debug("read fault @0x%x (%s) - skipping range safely",

@@ -27,6 +27,18 @@
 #ifndef KX_KERNEL_COMM_H
 #define KX_KERNEL_COMM_H
 
+/* Feature tests: expose POSIX/GNU declarations (O_CLOEXEC, ...) even when
+ * the translation unit is compiled with strict -std=c11. */
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE 1
+#endif
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE 1
+#endif
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200809L
+#endif
+
 #include <stddef.h>
 #include <stdint.h>
 
