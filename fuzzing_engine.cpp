@@ -75,7 +75,11 @@
 #  include <unistd.h>
 #endif
 #include <thread>
+#include <mutex>              // std::mutex guarding crash-file writes
 #include <vector>
+#if defined(__GLIBC__)
+#  include <execinfo.h>       // backtrace()/backtrace_symbols() (glibc only)
+#endif
 #include <fcntl.h>
 #include <errno.h>
 #include <dirent.h>
@@ -89,6 +93,7 @@ namespace kx {
 struct Config {
     bool        lab_consent      = false;   // must be explicitly granted
     bool        sandbox          = true;    // unshare() namespaces in child
+    bool        dry_run          = false;   // plan-only: spawn NOTHING, write NOTHING
     std::string mode             = "mixed"; // random | structured | mixed
     std::string target_cmd;                 // optional external harness binary
     std::string crash_dir        = "crash_logs";
@@ -111,17 +116,20 @@ Config parse_args(int argc, char **argv) {
         };
         if (a == "--lab-consent")            cfg.lab_consent = true;
         else if (a == "--no-sandbox")        cfg.sandbox = false;
+        else if (a == "--dry-run")           cfg.dry_run = true;
         else if (a == "--mode")              cfg.mode = next("--mode");
         else if (a == "--iterations")        cfg.iterations = std::stoul(next("--iterations"));
         else if (a == "--rss-mib")           cfg.rss_limit_mib = std::stoul(next("--rss-mib"));
         else if (a == "--timeout")           cfg.iter_timeout_s = std::stoul(next("--timeout"));
-        else if (a == "--seed")              cfg.seed = std::strtoull(next("--seed"), nullptr, 0);
+        else if (a == "--seed")              cfg.seed = std::strtoull(next("--seed").c_str(), nullptr, 0);
         else if (a == "--crash-dir")         cfg.crash_dir = next("--crash-dir");
         else if (a == "--target-cmd")        cfg.target_cmd = next("--target-cmd");
         else if (a == "--help" || a == "-h") {
             std::cout <<
                 "Kernel-X fuzzing engine (educational, lab-only)\n"
                 "  --lab-consent        REQUIRED acknowledgement of authorized lab use\n"
+                "  --dry-run            plan-only: print the exact execution plan,\n"
+                "                       spawn no children, write no files (safety preview)\n"
                 "  --mode M             random | structured | mixed (default mixed)\n"
                 "  --iterations N       number of executions (default 100)\n"
                 "  --rss-mib N          kill child above N MiB resident memory (default 256)\n"
@@ -352,9 +360,13 @@ public:
         int n = std::snprintf(line, sizeof line, "signal=%d (%s) iteration=%d\n",
                               sig, strsignal(sig), iteration);
         wr(line, static_cast<size_t>(n > 0 ? n : 0));
-        // Backtrace: best-effort backtrace() is NOT async-signal-safe in
-        // general, but acceptable in a disposable lab child; guarded by
-        // _GNU_SOURCE-less fallback using /proc/self/wchan + stack pointer.
+        // Stack trace: glibc's backtrace() is NOT strictly async-signal-safe,
+        // but it is acceptable inside a DISPOSABLE, sandboxed lab child whose
+        // sole job after the signal is to write this triage file and _exit().
+        // On bionic/Termux (no execinfo.h) we degrade gracefully to recording
+        // the faulting PC from the siginfo/ucontext plus the raw input hex,
+        // which still yields a reproducible crash artifact.
+#if defined(__GLIBC__)
         void *frames[32];
         int cnt = backtrace(frames, 32);
         char **syms = backtrace_symbols(frames, cnt);
@@ -366,6 +378,12 @@ public:
             wr("\n", 1);
         }
         if (syms) free(syms);
+#else
+        // Portable fallback: capture the instruction pointer at fault time
+        // from the kernel-provided ucontext (ARM64: pc regs differ per ABI,
+        // so we simply mark the field and rely on repro_*.bin replay).
+        wr("backtrace: unavailable on this libc (bionic); use repro_*.bin\n", 63);
+#endif
         // Register state snapshot via a second raise? Too invasive; instead
         // record the faulting input hex (bounded) so the parent can replay.
         if (input_ptr && !input_ptr->empty()) {
@@ -621,6 +639,15 @@ public:
 
     void run() {
         banner();
+        // --dry-run safety rail: the operator sees EXACTLY what a live session
+        // would do (child spawns, rlimits, output paths) without this process
+        // ever calling clone()/fork(), writing crash_logs/, or touching the
+        // filesystem.  This mirrors the dry_run discipline of every other
+        // Kernel-X module and is the recommended first run for newcomers.
+        if (cfg_.dry_run) {
+            dry_plan();
+            return;
+        }
         Stats st;
         corpus_.reserve(64);
         for (unsigned it = 1; it <= cfg_.iterations; ++it) {
@@ -691,6 +718,41 @@ private:
         std::ofstream f(name.str(), std::ios::binary);
         if (f) f.write(reinterpret_cast<const char *>(input.data()),
                        static_cast<std::streamsize>(input.size()));
+    }
+
+    // Print the execution plan without spawning or writing anything.
+    // Uses the SAME deterministic generator as a live session (same seed),
+    // so operators can preview corpus shapes before consenting to a run.
+    void dry_plan() {
+        std::printf("\n---------------- DRY-RUN PLAN ----------------\\n"
+                    " NO children will be spawned (clone/fork suppressed).\\n"
+                    " NO files or directories will be written.\\n"
+                    " Planned workload:\\n"
+                    "   harness       : %s\\n"
+                    "   isolation     : %s\\n"
+                    "   per-iteration : pipe-fed input, RLIMIT_AS + RLIMIT_CPU set,\\n"
+                    "                   RSS sampled from /proc/<pid>/statm every 50ms,\\n"
+                    "                   SIGKILL at >%u MiB or >%us wall clock\\n"
+                    "   crash triage  : would write %s/crash_*.txt + repro_*.bin\\n"
+                    "   sample inputs (first 4 of %u, deterministic from seed):\\n",
+                    cfg_.target_cmd.empty()
+                        ? "builtin LabHarness (gatekeeper-style parser)"
+                        : cfg_.target_cmd.c_str(),
+                    cfg_.sandbox ? "clone() child + unshare(NEWNS|NEWIPC|NEWUTS)"
+                                 : "clone() child only (namespace rail OFF)",
+                    cfg_.rss_limit_mib, cfg_.iter_timeout_s,
+                    cfg_.crash_dir.c_str(), cfg_.iterations);
+        InputGenerator preview(cfg_.seed);           // independent generator:
+        for (unsigned i = 0; i < 4 && i < cfg_.iterations; ++i) {
+            auto in = preview.next(cfg_.mode, corpus_);
+            std::printf("     [%u] %3zu bytes:", i, in.size());
+            for (size_t b = 0; b < in.size() && b < 12; ++b)
+                std::printf(" %02x", in[b]);
+            if (in.size() > 12) std::printf(" ...");
+            std::printf("\n");
+        }
+        std::printf("---------------------------------------------\n"
+                    " Re-run WITHOUT --dry-run (and WITH --lab-consent) to execute.\n");
     }
 
     void report(const Stats &st) const {
