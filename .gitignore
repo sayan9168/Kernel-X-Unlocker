@@ -1,1 +1,6 @@
 bin/
+
+# Generated artifacts / caches (do not commit)
+__pycache__/
+*.pyc
+reports/

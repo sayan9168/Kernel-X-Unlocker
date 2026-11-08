@@ -37,23 +37,28 @@ import argparse
 import json
 import logging
 import os
+import random
 import re
 import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
-import numpy as np
-
-try:
+try:  # optional scientific stack; unavailable on minimal/Termux installs
+    import numpy as np
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.model_selection import cross_val_score
     from sklearn.pipeline import Pipeline
     from sklearn.preprocessing import StandardScaler
     SKLEARN_AVAILABLE = True
 except ImportError:  # pragma: no cover
+    np = None  # type: ignore[assignment]
     RandomForestClassifier = None  # type: ignore[assignment]
     SKLEARN_AVAILABLE = False
+
+def _clip01(value: float) -> float:
+    """stdlib-only replacement for np.clip(value, 0, 1)."""
+    return max(0.0, min(1.0, float(value)))
 
 logger = logging.getLogger("kernel_x.ai_predictor")
 
@@ -156,7 +161,7 @@ def _build_synthetic_corpus() -> Tuple[np.ndarray, np.ndarray]:
     Features: [kmaj, kmin, months_behind, arm64, arm32, x86, gki, anomaly]
     Labels  : 0 LOW | 1 MODERATE | 2 HIGH exposure class.
     """
-    rng = np.random.default_rng(1337)  # deterministic for reproducible labs
+    rng = random.Random(1337)  # deterministic for reproducible labs
     rows: List[List[float]] = []
     labels: List[int] = []
 
@@ -165,11 +170,12 @@ def _build_synthetic_corpus() -> Tuple[np.ndarray, np.ndarray]:
     def add(kmaj: int, kmin: int, months: int, arch: Tuple[int, int, int],
             gki: int, label: int, n: int = 40) -> None:
         for _ in range(n):
-            jitter_m = max(0, months + int(rng.integers(-1, 2)))
-            anomaly = float(np.clip(rng.normal(0.05 if label == 0 else
-                                               (0.3 if label == 1 else 0.6),
-                                               0.08), 0.0, 1.0))
-            rows.append([kmaj, kmin, jitter_m, *arch, gki, anomaly])
+            jitter_m = max(0, months + int(rng.uniform(-1.0, 1.0)))
+            base = 0.05 if label == 0 else (0.3 if label == 1 else 0.6)
+            anomaly = _clip01(base + rng.uniform(-0.08, 0.08))
+            rows.append([float(kmaj), float(kmin), float(jitter_m),
+                         float(arch[0]), float(arch[1]), float(arch[2]),
+                         float(gki), anomaly])
             labels.append(label)
 
     # Legacy non-GKI series (EOL upstream lines)
@@ -193,7 +199,7 @@ def _build_synthetic_corpus() -> Tuple[np.ndarray, np.ndarray]:
         add(6, 6, 1, arch, 1, 0)
         add(6, 1, 9, arch, 1, 1)
 
-    return np.asarray(rows, dtype=float), np.asarray(labels, dtype=int)
+    return rows, labels
 
 
 def features_from_device(dev: DeviceInfo,
@@ -204,7 +210,7 @@ def features_from_device(dev: DeviceInfo,
     is_arm64 = 1 if ("arm64" in arch or "aarch64" in arch) else 0
     is_arm32 = 1 if ("armeabi" in arch or "armv7" in arch) else 0
     is_x86 = 1 if ("x86" in arch or "intel" in arch) else 0
-    anomaly = float(np.clip(scanner_anomaly_score, 0.0, 1.0))
+    anomaly = _clip01(scanner_anomaly_score)
     return [kmaj, kmin, dev.patch_months_behind(),
             is_arm64, is_arm32, is_x86, 1 if dev.gki_managed else 0, anomaly]
 
@@ -246,12 +252,14 @@ class VulnerabilityRiskPredictor:
 
     def train_on_datasets(self, data_points: Any, labels: Any) -> Dict[str, Any]:
         """Train on an explicit (X, y) pair; X must match FEATURE_NAMES."""
-        X = np.asarray(data_points, dtype=float)
-        y = np.asarray(labels, dtype=int)
-        if X.ndim != 2 or X.shape[1] != len(FEATURE_NAMES):
+        X = [list(map(float, row)) for row in data_points]
+        y = [int(v) for v in labels]
+        if (not isinstance(X, list) or not X
+                or any(len(row) != len(FEATURE_NAMES) for row in X)
+                or len(y) != len(X)):
             raise ValueError(
-                f"data_points must be shape (n, {len(FEATURE_NAMES)}), got "
-                f"{X.shape}")
+                f"data_points must be shape (n, {len(FEATURE_NAMES)}) with "
+                f"matching labels, got {len(X)} rows")
         return self._fit(X, y)
 
     def train_default_corpus(self) -> Dict[str, Any]:
@@ -293,14 +301,14 @@ class VulnerabilityRiskPredictor:
         anomalies contribute a bounded hygiene signal (never raw bytes).
         """
         anomaly = _anomaly_signal_from_scan(scanner_report)
-        feats = np.array([features_from_device(dev, anomaly)], dtype=float)
+        feats = [features_from_device(dev, anomaly)]
 
         if not self.is_trained:
             logger.warning("[!] model not trained - returning heuristic fallback")
             return self._fallback_result(dev, anomaly)
 
         proba = self.pipeline.predict_proba(feats)[0]
-        idx = int(np.argmax(proba))
+        idx = int(max(range(len(proba)), key=lambda i: proba[i]))
         pred = int(self.pipeline.classes_[idx])
         conf = float(proba[idx])
         per_class = {
@@ -398,7 +406,7 @@ def _anomaly_signal_from_scan(scan_report: Optional[Dict[str, Any]]) -> float:
         score += 0.05 * max(0, len(t.get("high_entropy_regions", [])) - 1)
         if t.get("status") == "denied":
             score -= 0.10
-    return float(np.clip(score, 0.0, 1.0))
+    return _clip01(score)
 
 
 # ---------------------------------------------------------------------------
