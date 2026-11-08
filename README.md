@@ -1,66 +1,170 @@
-🏆 Kernel-X-Unlocker (The Universal Android Decryptor)
+# Kernel-X-Unlocker
 
-Developer: sayan9168
+**Advanced Android Kernel Security Research Framework**  
+*Educational & Research Purpose Only*
 
-Status: 🚀 Active Research & Development
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Status](https://img.shields.io/badge/Status-Active%20Research-brightgreen)](https://github.com/sayan9168/Kernel-X-Unlocker)
+[![Target](https://img.shields.io/badge/Target-Android%2012%2F13%2F14%2B-blue)](https://github.com/sayan9168/Kernel-X-Unlocker)
+[![Stars](https://img.shields.io/github/stars/sayan9168/Kernel-X-Unlocker?style=flat-square)](https://github.com/sayan9168/Kernel-X-Unlocker/stargazers)
 
-Target: Android 12, 13, 14+ (Non-Rooted)
+> **Developer:** [sayan9168](https://github.com/sayan9168) (Sayan Mahata)  
+> **Status:** Active Research & Development  
+> **Focus:** File-Based Encryption (FBE), Verified Boot (AVB 2.0), Gatekeeper/Keymaster analysis, memory forensics & kernel surface research
 
-📖 Overview
+---
 
-Kernel-X-Unlocker is an advanced security research tool designed to bypass Android's File-Based Encryption (FBE) and Rollback Protection. By injecting payloads directly into the kernel memory (RAM) via Termux, this tool aims to bypass lockscreens without requiring permanent root access or triggering system-wide corruption.
+## Overview
 
-🛠️ Core Features (The Invention)
+**Kernel-X-Unlocker** is a modular security research platform designed for studying Android kernel-level protections on non-rooted devices.  
+It combines C/C++ low-level components, Python analysis engines, plugin architecture, risk scoring, simulation, and reporting tools.
 
-Zero-Root Kernel Access: Establishes direct communication with the Android kernel via Termux environment.
+The project is intended strictly for:
+- Security researchers
+- Academic study of Android encryption & verified boot
+- Defensive analysis and vulnerability research
+- Ethical security testing on devices you own or have explicit permission to analyze
 
-Live Memory Patching: Temporarily modifies Gatekeeper and Keymaster services in-memory to bypass password validation.
+---
 
-AVB 2.0 Bypass: Implements mechanisms to neutralize Verified Boot alerts, preventing bootloops or "Device Corrupted" errors after modification.
+## Core Capabilities
 
-FBE Key Extraction: Utilizes memory-scanning algorithms to locate the master encryption keys required to decrypt the /data partition.
+| Module | Description |
+|--------|-------------|
+| **Zero-Root Research Surface** | Termux-based interaction and analysis of kernel-exposed interfaces |
+| **Memory Analysis Engine** | Advanced scanners for pattern detection and key material research |
+| **AVB / Rollback Research** | Tools for studying Verified Boot 2.0 and rollback protection behavior |
+| **SELinux Policy Analyzer** | Policy inspection and analysis utilities |
+| **Forensic Imager** | Memory and evidence collection components |
+| **Risk Engine** | Scoring and correlation of findings |
+| **Plugin System** | Extensible analysis plugins (FBE config, GKI lineage, keystore policy, etc.) |
+| **Simulation & Dashboard** | Local simulator + visualizer / remote dashboard for research workflows |
+| **AI Pattern Predictor** | Experimental pattern prediction for research assistance |
+| **Reporting** | HTML / Markdown / JSON research reports |
 
-📂 Repository Structure
+---
 
-├── bin/                    # Compiled binaries (Core Engine)
-├── unlocker_core.c         # Main C code for Kernel Exploitation
-├── rollback_bypass.c       # AVB & Rollback Protection bypass logic
-├── decryptor_module.py     # Python script for hash & key decryption
-├── scanner_engine.sh       # Automation script for scanning vulnerabilities
-├── setup_master.sh         # One-click installer for all dependencies
-└── README.md               # Documentation
+## Repository Structure
 
-🚀 How to Use (Research Mode)
+```text
+Kernel-X-Unlocker/
+├── bin/                          # Compiled research binaries
+│   ├── avb_posture_analyzer
+│   ├── kernel_x_audit
+│   └── selinux_policy_analyzer
+├── core/                         # Core engines
+│   └── fuzzing_engine.cpp
+├── src/                          # Low-level C sources
+│   ├── unlocker_core.c
+│   ├── exploit_logic.c
+│   ├── kernel_comm.c
+│   └── memory_utils.c
+├── include/                      # Headers
+│   ├── exploit_logic.h
+│   ├── kernel_comm.h
+│   └── memory_utils.h
+├── kernel_x/                     # Main Python framework
+│   ├── __init__.py
+│   ├── dashboard.py
+│   ├── plugin_manager.py
+│   ├── reporter.py
+│   ├── risk_engine.py
+│   ├── simulator.py
+│   └── plugins/
+│       ├── fbe_config_checker.py
+│       ├── gki_lineage_analyzer.py
+│       ├── keystore_policy_probe.py
+│       └── patch_latency_stats.py
+├── dashboard/                    # Visualization
+│   └── visualizer_dashboard.py
+├── utils/                        # Shared utilities
+├── reports/                      # Sample research reports
+├── forensic_imager.c
+├── rollback_bypass.c
+├── selinux_policy_analyzer.c
+├── memory_scanner_advanced.py
+├── side_channel_analyzer.py
+├── symbol_resolver.py
+├── correlation_engine.py
+├── ai_pattern_predictor.py
+├── evidence_logger.py
+├── remote_dashboard.py
+├── decryptor_module.py
+├── scanner_engine.sh
+├── setup_master.sh
+└── LICENSE
+```
 
-Follow these steps within your Termux environment to initialize the toolset:
+---
 
-1. Clone & Setup
+## Quick Start (Research Mode)
 
-2. git clone https://github.com/sayan9168/Kernel-X-Unlocker
+> **Only use on devices you own or have explicit written authorization to research.**
 
+### 1. Clone & Setup (Termux / Linux)
+
+```bash
+git clone https://github.com/sayan9168/Kernel-X-Unlocker.git
 cd Kernel-X-Unlocker
-
-chmod +x setup_master.sh
-
+chmod +x setup_master.sh scanner_engine.sh
 ./setup_master.sh
+```
 
-Start Scanning
+### 2. Run Scanner / Analysis
 
+```bash
 ./scanner_engine.sh
+```
 
+### 3. Explore Framework Components
 
-Execution
+```bash
+# Example: run individual research modules
+python3 memory_scanner_advanced.py
+python3 -m kernel_x.simulator
+python3 dashboard/visualizer_dashboard.py
+```
 
-The tool will automatically detect the kernel version and push the appropriate Kernel Payload to attempt a live memory bypass.
+The framework detects environment characteristics and loads appropriate analysis plugins and risk models.
 
-⚠️ Security Warning & Disclaimer
+---
 
-Disclaimer: This project is strictly for Educational and Ethical Research Purposes Only. Gaining unauthorized access to a mobile device is illegal and violates privacy laws. The developer (sayan9168) assumes no liability for any misuse or damage caused by this software. Use at your own risk.
+## Research Roadmap
 
-📈 Future Roadmap
+- [ ] Expanded Snapdragon 8 Gen series surface analysis
+- [ ] Deeper Samsung Knox / RKP research support
+- [ ] Improved AI-assisted pattern discovery pipeline
+- [ ] More formalized GKI lineage & patch latency tooling
+- [ ] Enhanced report templates and export formats
+- [ ] Better isolation / simulation of high-risk operations
 
-[ ] Support for Qualcomm Snapdragon 8 Gen 3 security bypass.
+---
 
-[ ] Integration of Samsung Knox Real-time Kernel Protection (RKP) bypass.
+## Disclaimer
 
-[ ] AI-driven automated Zero-Day vulnerability discovery engine.
+**This project is strictly for educational and ethical security research.**
+
+- Unauthorized access to any device is illegal.
+- The developer (sayan9168) assumes **no liability** for misuse, damage, or legal consequences.
+- Use only on systems you own or have explicit permission to analyze.
+- Always follow applicable laws and responsible disclosure practices.
+
+By using this software you agree that you understand and accept full responsibility for your actions.
+
+---
+
+## License
+
+MIT License — see [LICENSE](LICENSE) file.
+
+---
+
+## Author
+
+**Sayan Mahata** ([@sayan9168](https://github.com/sayan9168))  
+System Architect & Security Researcher  
+Founder — Sayanox Private Limited
+
+---
+
+> **Star the repo** if you find the research framework useful, and feel free to open issues for discussion (research-related only).
