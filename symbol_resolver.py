@@ -208,9 +208,17 @@ class SymbolResolver:
                 self._loaded = True
                 return self._load_error
         except FileNotFoundError:
-            self._load_error = f"{self.source_path} does not exist (not Linux?)"
-            self._loaded = True
-            return self._load_error
+            # A missing live source is not fatal: an authorized offline
+            # capture may still be available for forensic/replay work.
+            logger.info("live source %s missing; trying offline capture",
+                        self.source_path)
+            text, source = self._read_offline()
+            if text is None:
+                self._load_error = (
+                    f"{self.source_path} does not exist and no offline "
+                    f"kallsyms capture was found in {self.offline_dir}")
+                self._loaded = True
+                return self._load_error
         except OSError as exc:                       # EIO, ENODEV, ...
             self._load_error = f"OS error while reading kallsyms: {exc}"
             self._loaded = True

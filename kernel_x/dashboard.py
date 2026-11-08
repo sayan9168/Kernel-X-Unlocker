@@ -59,6 +59,7 @@ DASHBOARD_TEMPLATE = """<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kernel-X Research Toolkit — {{ session_id }}</title>
+<meta http-equiv="refresh" content="{{ refresh_interval }}">
 <style>
 :root{--bg:#0f141b;--panel:#161d27;--ink:#e6edf3;--muted:#8b98a8;--accent:#4fc3f7;
 --ok:#3fb950;--warn:#d29922;--bad:#f85149;--line:#243040}
@@ -96,11 +97,15 @@ footer{padding:14px 24px;color:var(--muted);font-size:11px;border-top:1px solid 
   </div>
   <div>
     <span class="badge" style="background:{{ sev_color }}">{{ severity }} · {{ '%.1f'|format(risk_score) }}/10</span>
+    <span class="info" style="margin-left:8px">auto-refresh {{ refresh_interval }}s</span>
     <form method="post" action="/export" style="display:inline">
       <input type="hidden" name="fmt" value="md"><button type="submit">Export report (.md)</button>
     </form>
     <form method="post" action="/export" style="display:inline">
       <input type="hidden" name="fmt" value="json"><button type="submit">Export (.json)</button>
+    </form>
+    <form method="post" action="/refresh" style="display:inline; margin-left:6px">
+      <button type="submit">refresh now</button>
     </form>
   </div>
 </header>
@@ -179,8 +184,10 @@ class DashboardController:
         sysroot: Optional[str] = None,
         report_dir: str = "reports",
         plugins_dir: Optional[str] = None,
+        refresh_interval: float = 5.0,
     ) -> None:
         self.fingerprinter = DeviceFingerprinter(mock_properties=mock_properties, sysroot=sysroot)
+        self.refresh_interval = float(refresh_interval)
         self.mapper = VulnerabilitySurfaceMapper()
         self.report_gen = AcademicReportGenerator(output_dir=report_dir)
         self.plugin_manager = PluginManager(plugins_dir=plugins_dir)
@@ -301,6 +308,7 @@ class DashboardController:
             "scenarios": scenarios,
             "plugins": [plugin.manifest() for plugin in self.plugin_manager.plugins],
             "last_export": dict(self.last_export),
+            "refresh_interval": self.refresh_interval,
         }
 
     def api_state(self) -> Dict[str, Any]:
@@ -377,6 +385,12 @@ class DashboardController:
         def refresh() -> Any:
             controller.run_analysis()
             return jsonify({"status": "re-analysed"})
+
+        @app.route("/refresh", methods=["GET"])
+        def refresh_get() -> Any:
+            controller.run_analysis()
+            from flask import redirect
+            return redirect("/")
 
         return app
 
@@ -532,6 +546,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser.add_argument("--allow-non-local", action="store_true",
                         help="explicitly permit binding beyond loopback (discloses audit telemetry)")
     parser.add_argument("--export-only", action="store_true", help="run pipeline, export, exit (no server)")
+    parser.add_argument("--refresh-interval", type=float, default=5.0,
+                        help="auto-refresh interval for the web UI (seconds)")
     args = parser.parse_args(argv)
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -545,7 +561,8 @@ def main(argv: Optional[List[str]] = None) -> int:
             parser.error(f"cannot read --mock-props: {exc}")
 
     controller = DashboardController(
-        mock_properties=mock_props, sysroot=args.sysroot, report_dir=args.report_dir
+        mock_properties=mock_props, sysroot=args.sysroot, report_dir=args.report_dir,
+        refresh_interval=args.refresh_interval,
     )
     if args.export_only:
         written = controller.export("md")

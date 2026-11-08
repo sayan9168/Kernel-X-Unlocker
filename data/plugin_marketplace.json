@@ -1,0 +1,90 @@
+{
+  "schema": "kx-marketplace/1.0",
+  "count": 5,
+  "plugins": [
+    {
+      "plugin_id": "gki-lineage-analyzer",
+      "name": "gki-lineage-analyzer",
+      "version": "1.2.0",
+      "description": "Classifies kernel lineage vs GKI LTS baselines and flags downstream drift.",
+      "author": "Kernel-X core team",
+      "capabilities": [
+        "telemetry",
+        "analysis"
+      ],
+      "source": "core",
+      "installed_path": "/home/user/Kernel-X-Unlocker/kernel_x/plugins",
+      "installed": true,
+      "content_hash": "",
+      "loaded": true,
+      "last_error": null
+    },
+    {
+      "plugin_id": "fbe-config-checker",
+      "name": "fbe-config-checker",
+      "version": "1.1.0",
+      "description": "Reviews FBE/metadata/keystore configuration coherence against AOSP baselines.",
+      "author": "Kernel-X core team",
+      "capabilities": [
+        "analysis",
+        "audit"
+      ],
+      "source": "core",
+      "installed_path": "/home/user/Kernel-X-Unlocker/kernel_x/plugins",
+      "installed": true,
+      "content_hash": "",
+      "loaded": true,
+      "last_error": null
+    },
+    {
+      "plugin_id": "patch-latency-stats",
+      "name": "patch-latency-stats",
+      "version": "1.0.3",
+      "description": "Bulletin-lag statistics across mapped advisories (academic metrics).",
+      "author": "Kernel-X core team",
+      "capabilities": [
+        "analysis",
+        "knowledge-base"
+      ],
+      "source": "core",
+      "installed_path": "/home/user/Kernel-X-Unlocker/kernel_x/plugins",
+      "installed": true,
+      "content_hash": "",
+      "loaded": true,
+      "last_error": null
+    },
+    {
+      "plugin_id": "keystore-policy-probe",
+      "name": "keystore-policy-probe",
+      "version": "1.0.0",
+      "description": "Dry-run probe of auth-bound keystore policy against simulated FBE states.",
+      "author": "Kernel-X core team",
+      "capabilities": [
+        "simulation",
+        "modeling"
+      ],
+      "source": "core",
+      "installed_path": "/home/user/Kernel-X-Unlocker/kernel_x/plugins",
+      "installed": true,
+      "content_hash": "",
+      "loaded": true,
+      "last_error": null
+    },
+    {
+      "plugin_id": "sample-plugin",
+      "name": "sample-plugin",
+      "version": "1.0.0",
+      "description": "Sample marketplace plugin (smoke test fixture)",
+      "author": "Kernel-X QA",
+      "capabilities": [
+        "scan"
+      ],
+      "source": "core",
+      "installed_path": "/home/user/Kernel-X-Unlocker/kernel_x/plugins",
+      "installed": true,
+      "content_hash": "",
+      "loaded": true,
+      "last_error": null
+    }
+  ]
+}
